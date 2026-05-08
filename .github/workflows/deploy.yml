@@ -1,0 +1,35 @@
+# Nama file: .github/workflows/deploy.yml
+
+name: Deploy Landing Page to Hostinger
+
+# Perintah ini akan dijalankan setiap kali ada 'push' ke branch 'main'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ftp-deploy:
+    name: FTP Deploy
+    runs-on: ubuntu-latest
+    steps:
+      # Langkah 1: Mengunduh kode dari repositori GitHub
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Langkah 2: Mengirim file ke Hostinger via FTP
+      - name: Deploy to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          # Alamat server FTP Hostinger. Ambil dari 'FTP Accounts' di hPanel.
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          
+          # Username akun FTP Hostinger.
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          
+          # Password akun FTP. Disimpan di GitHub Secrets.
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          
+          # Direktori tujuan di Hostinger. Biasanya /public_html/
+          # Jika ingin menaruh di subfolder, contoh: /public_html/ldu/
+          server-dir: /public_html/

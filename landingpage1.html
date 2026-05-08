@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ebook Gratis: 7 Kebiasaan Pembuka Rejeki ala Nabi</title>
+    <!-- Kita gunakan Tailwind CSS via CDN agar desain langsung rapi dan modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    
+    <!-- Wrapper Utama -->
+    <div class="max-w-xl mx-auto px-4 py-12">
+        
+        <!-- [P] PROBLEM - Mengidentifikasi masalah target market (Tiktokers) -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-red-600 mb-4">Kerja Keras Banting Tulang Tiap Hari, Tapi Tabungan Selalu Habis Tak Bersisa?</h1>
+            <p class="text-lg text-gray-600">Sudah mencoba berbagai cara berbisnis atau bekerja keras dari pagi ke malam, tapi rejeki terasa seret dan kebutuhan terus menumpuk...</p>
+        </div>
+
+        <!-- [A] AGITATION - Mengaduk emosi agar mereka merasa butuh solusi -->
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-8 border-l-4 border-yellow-500">
+            <p class="text-gray-700 mb-3">Rasanya lelah secara fisik dan mental. Tiap bulan pusing memikirkan tagihan, hutang yang membebani, dan masa depan keluarga yang terasa tidak pasti.</p>
+            <p class="text-gray-800 font-semibold italic">Mungkinkah ada yang salah dengan cara kita menjemput rejeki? Mungkinkah keberkahan (barokah) telah hilang dari penghasilan kita?</p>
+        </div>
+
+        <!-- [S] SOLUTION - Menawarkan Ebook sebagai jalan keluar -->
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold text-green-600 mb-4">Inilah Jawabannya: "7 Kebiasaan Pembuka Rejeki ala Nabi"</h2>
+            <p class="text-gray-600 mb-4">Bukan dengan cara ajaib yang melanggar syariat, tapi dengan mengembalikan pola hidup kita sesuai tuntunan Rasulullah. Temukan 7 rahasia harian yang sering diremehkan, namun terbukti mampu menarik rejeki yang berkah dan berlimpah.</p>
+            <p class="text-green-700 font-extrabold text-lg animate-pulse">Download Ebook Ini GRATIS Sekarang!</p>
+        </div>
+
+        <!-- [CTA] FORMULIR LEAD MAGNET -->
+        <div class="bg-green-50 p-8 rounded-xl shadow-lg border border-green-200">
+            <h3 class="text-xl font-bold text-center mb-6">Isi Form Untuk Dikirimkan Ebook ke WhatsApp Anda</h3>
+            
+            <form id="funnelForm" class="space-y-5">
+                <!-- Data Standar -->
+                <div>
+                    <label for="nama" class="block text-sm font-medium text-gray-700">Nama Panggilan</label>
+                    <input type="text" id="nama" required placeholder="Cth: Mas Fulan" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label for="wa" class="block text-sm font-medium text-gray-700">Nomor WhatsApp (Aktif)</label>
+                    <input type="tel" id="wa" required placeholder="08123456789" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                </div>
+                
+                <!-- Data Umpan untuk AI Agent 2 (Analis Data Buyer Persona) -->
+                <div>
+                    <label for="pain_point" class="block text-sm font-medium text-gray-700">Apa harapan terbesar Anda tahun ini?</label>
+                    <select id="pain_point" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white">
+                        <option value="">-- Pilih salah satu --</option>
+                        <option value="Ingin segera melunasi hutang riba/pinjol">Ingin segera melunasi hutang</option>
+                        <option value="Ingin pendapatan stabil untuk keluarga">Ingin pendapatan stabil untuk keluarga</option>
+                        <option value="Ingin mengembangkan bisnis/usaha">Ingin mengembangkan bisnis/usaha</option>
+                        <option value="Ingin hati lebih tenang dan rejeki berkah">Ingin hati lebih tenang dan rejeki berkah</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 shadow-md">
+                    Kirim Ebook ke WhatsApp Saya!
+                </button>
+            </form>
+            <div id="loadingMsg" class="hidden text-center mt-4 text-green-700 font-semibold">Memproses pengiriman, mohon tunggu...</div>
+        </div>
+    </div>
+
+    <!-- Script JavaScript Murni untuk Integrasi ke Node.js Backend -->
+    <script>
+        document.getElementById('funnelForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Mencegah form memuat ulang halaman
+            
+            const btnSubmit = document.querySelector('button[type="submit"]');
+            const loadingMsg = document.getElementById('loadingMsg');
+            
+            // UX: Disable tombol agar user tidak klik 2 kali
+            btnSubmit.disabled = true;
+            loadingMsg.classList.remove('hidden');
+
+            // Menyusun Payload JSON
+            const leadData = {
+                nama: document.getElementById('nama').value,
+                whatsapp: document.getElementById('wa').value,
+                harapan_user: document.getElementById('pain_point').value
+            };
+
+            try {
+                // URL Web App dari Google Apps Script Bos
+                const backendEndpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+                
+                // Menggunakan fetch bawaan browser (Vanilla JS)
+                const response = await fetch(backendEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(leadData)
+                });
+
+                if (response.ok) {
+                    alert("Alhamdulillah! Form berhasil disubmit. Ebook akan segera dikirim ke WA Anda oleh admin (CS) kami.");
+                    document.getElementById('funnelForm').reset();
+                    // Opsi: Arahkan ke halaman Terima Kasih
+                    // window.location.href = "thank-you.html";
+                } else {
+                    alert("Waduh, ada kendala server. Silakan coba beberapa saat lagi.");
+                }
+            } catch (error) {
+                console.error("Kesalahan jaringan:", error);
+                alert("Gagal terhubung ke server kami.");
+            } finally {
+                // UX: Kembalikan tombol ke state semula
+                btnSubmit.disabled = false;
+                loadingMsg.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

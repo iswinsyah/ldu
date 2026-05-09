@@ -21,8 +21,8 @@ jobs:
       - name: Deploy to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          # GANTI tulisan "ISI_DENGAN_IP_ATAU_FTP_HOSTINGER" dengan alamat aslinya. Contoh: 194.168.1.100 atau ftp.namadomainbos.com
-          server: ISI_DENGAN_IP_ATAU_FTP_HOSTINGER
+          # Alamat server FTP Hostinger. Ambil dari 'FTP Accounts' di hPanel.
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
           
           # Username akun FTP Hostinger.
           username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
@@ -30,6 +30,6 @@ jobs:
           # Password akun FTP. Disimpan di GitHub Secrets.
           password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
           
-          # Direktori tujuan di Hostinger. Biasanya /public_html/
+          # Direktori tujuan untuk subdomain ldu
           # Jika ingin menaruh di subfolder, contoh: /public_html/ldu/
-          server-dir: /public_html/
+          server-dir: /public_html/ldu/

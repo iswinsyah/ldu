@@ -204,6 +204,7 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
                     <h4 class="font-bold text-gray-700 mb-4"><i class="fas fa-plus-circle text-green-600 mr-2"></i>Tambah Program Baru</h4>
                     <form id="form-program" class="space-y-5">
+                        <input type="hidden" id="prog-id" value="">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Judul Program</label>
                             <input type="text" id="prog-judul" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Contoh: Wakaf Sumur Bor untuk Desa X">
@@ -258,6 +259,7 @@
     <!-- Script Fetch Data dari Database LDU via Web App Apps Script -->
     <script>
         let globalLeadsData = []; // Menyimpan data leads untuk diexport
+        let globalProgramsData = []; // Menyimpan data program untuk fitur edit
 
         document.addEventListener("DOMContentLoaded", async function() {
             const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
@@ -329,6 +331,7 @@
                     }
                     
                     // 5. Render Tabel Program di Tab Campaign
+                    globalProgramsData = result.data.programs || [];
                     const progBody = document.getElementById('program-table-body');
                     progBody.innerHTML = "";
                     if(!result.data.programs || result.data.programs.length === 0) {
@@ -342,7 +345,9 @@
                                     <td class="px-6 py-4">Rp ${Number(p.target_dana).toLocaleString('id-ID')}</td>
                                     <td class="px-6 py-4">Rp ${terkumpul.toLocaleString('id-ID')}</td>
                                     <td class="px-6 py-4 text-right">
-                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">${p.status}</span>
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold mr-2">${p.status}</span>
+                                        <button onclick="editProgram(${p.id})" class="text-blue-500 hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button>
+                                        <button onclick="hapusProgram(${p.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>`;
                         });
@@ -413,8 +418,10 @@
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = 'Menyimpan... <i class="fas fa-spinner fa-spin ml-2"></i>';
 
+            const progId = document.getElementById('prog-id').value;
             const payload = {
-                type: 'tambah_program',
+                type: progId ? 'edit_program' : 'tambah_program',
+                id: progId,
                 judul: document.getElementById('prog-judul').value,
                 target_dana: document.getElementById('prog-target').value,
                 url_gambar: document.getElementById('prog-gambar').value,
@@ -424,22 +431,65 @@
             try {
                 const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
                 const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
-                const result = await response.json();
                 
-                if (result.status === "success" || result.message === "Program berhasil ditambahkan.") {
-                    alert("Alhamdulillah! Program berhasil diterbitkan.");
-                    this.reset();
+                let result;
+                const responseText = await response.text(); // Ambil teks mentah dari Google
+                try {
+                    result = JSON.parse(responseText); // Coba ubah ke JSON
+                } catch (e) {
+                    throw new Error("Respon server bukan JSON. Kemungkinan URL Web App kadaluarsa atau lupa Deploy Versi Baru.\n\nDetail: " + responseText.substring(0, 100));
+                }
+
+                if (result.status === "success") {
+                    alert("Alhamdulillah! Program berhasil disimpan.");
+                    window.location.reload(); // Refresh untuk update tabel
                 } else {
                     alert("Gagal menyimpan program: " + (result.message || "Unknown error"));
                 }
             } catch (error) {
                 console.error("Error:", error);
-                alert("Terjadi kesalahan jaringan saat menyimpan program.");
+                alert("Error: " + error.message);
             } finally {
                 btnSubmit.disabled = false;
                 btnSubmit.innerHTML = originalText;
             }
         });
+
+        // Fungsi untuk memasukkan data ke form Edit
+        function editProgram(id) {
+            const prog = globalProgramsData.find(p => p.id === id);
+            if (prog) {
+                document.getElementById('prog-id').value = prog.id;
+                document.getElementById('prog-judul').value = prog.judul;
+                document.getElementById('prog-target').value = prog.target_dana;
+                document.getElementById('prog-gambar').value = prog.url_gambar;
+                document.getElementById('prog-artikel').value = prog.artikel;
+                
+                const btnSubmit = document.querySelector('#form-program button[type="submit"]');
+                btnSubmit.innerHTML = 'Update Program <i class="fas fa-save ml-2"></i>';
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll ke atas form
+            }
+        }
+
+        // Fungsi untuk Hapus Program
+        async function hapusProgram(id) {
+            if (confirm("Apakah Bos yakin ingin menghapus program ini?")) {
+                try {
+                    const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+                    const response = await fetch(endpoint, { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify({ type: 'hapus_program', id: id }) });
+                    const result = await response.json();
+                    if (result.status === "success") {
+                        alert("Program berhasil dihapus.");
+                        window.location.reload();
+                    } else {
+                        alert("Gagal menghapus: " + result.message);
+                    }
+                } catch (e) {
+                    alert("Error saat menghapus program.");
+                }
+            }
+        }
     </script>
 </body>
 </html>

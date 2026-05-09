@@ -20,7 +20,7 @@
             </div>
         </div>
         <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            <a href="#" class="flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium">
+            <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium cursor-pointer">
                 <i class="fas fa-chart-pie w-5"></i> Dashboard
             </a>
             <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
@@ -29,7 +29,7 @@
             <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
                 <i class="fas fa-hand-holding-heart w-5"></i> Data Donatur
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
+            <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-bullhorn w-5"></i> Campaign / Program
             </a>
             <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
@@ -51,7 +51,7 @@
                 <button class="md:hidden text-gray-500 hover:text-green-600 focus:outline-none">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
-                <h2 class="text-xl font-bold text-gray-800">Overview</h2>
+                <h2 id="header-title" class="text-xl font-bold text-gray-800">Overview</h2>
             </div>
             <div class="flex items-center gap-4">
                 <button class="text-gray-400 hover:text-green-600 relative">
@@ -66,7 +66,7 @@
         </header>
 
         <!-- Dashboard Content -->
-        <div class="flex-1 overflow-y-auto p-6">
+        <div id="section-dashboard" class="flex-1 overflow-y-auto p-6">
             
             <!-- TOFU: Ringkasan Kunjungan -->
             <div class="mb-6">
@@ -194,6 +194,65 @@
                 </div>
             </div>
         </div>
+
+        <!-- Program Content (Awalnya Disembunyikan / Hidden) -->
+        <div id="section-program" class="flex-1 overflow-y-auto p-6 hidden">
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-800 text-lg mb-4">Manajemen Program Donasi</h3>
+                
+                <!-- Form Tambah Program -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <h4 class="font-bold text-gray-700 mb-4"><i class="fas fa-plus-circle text-green-600 mr-2"></i>Tambah Program Baru</h4>
+                    <form id="form-program" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Judul Program</label>
+                            <input type="text" id="prog-judul" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Contoh: Wakaf Sumur Bor untuk Desa X">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Target Dana (Rp)</label>
+                                <input type="number" id="prog-target" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Contoh: 50000000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">URL Gambar Banner</label>
+                                <input type="url" id="prog-gambar" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="https://contoh.com/gambar.jpg">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Artikel / Deskripsi Program</label>
+                            <textarea id="prog-artikel" rows="5" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Ceritakan detail program donasi ini..."></textarea>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-md transition shadow-md">
+                                Terbitkan Program <i class="fas fa-paper-plane ml-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tabel Daftar Program -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                    <div class="px-6 py-5 border-b border-gray-100">
+                        <h4 class="font-bold text-gray-800">Daftar Program Aktif</h4>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                    <th class="px-6 py-3">Program</th>
+                                    <th class="px-6 py-3">Target (Rp)</th>
+                                    <th class="px-6 py-3">Terkumpul</th>
+                                    <th class="px-6 py-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="program-table-body">
+                                <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada program yang diinput.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Script Fetch Data dari Database LDU via Web App Apps Script -->
@@ -300,6 +359,36 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        });
+
+        // Event Listener untuk UI Switch Tab (Navigasi Sidebar)
+        function switchTab(tabName) {
+            // Sembunyikan semua section
+            document.getElementById('section-dashboard').classList.add('hidden');
+            document.getElementById('section-program').classList.add('hidden');
+            
+            // Reset style semua nav
+            const navClasses = "flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer";
+            const activeClasses = "flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium cursor-pointer";
+            
+            document.getElementById('nav-dashboard').className = navClasses;
+            document.getElementById('nav-program').className = navClasses;
+            
+            // Munculkan section yang dipilih dan beri warna aktif pada nav-nya
+            document.getElementById('section-' + tabName).classList.remove('hidden');
+            document.getElementById('nav-' + tabName).className = activeClasses;
+
+            // Ubah Judul Header
+            const headerTitle = document.getElementById('header-title');
+            if (tabName === 'dashboard') headerTitle.innerText = "Overview";
+            if (tabName === 'program') headerTitle.innerText = "Campaign / Program";
+        }
+
+        // Event Listener Form Program (Sementara UI / Mock)
+        document.getElementById('form-program').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert("Form Program UI berfungsi! Nanti data ini akan dikirim ke MySQL untuk ditampilkan di Frontpage.");
+            this.reset();
         });
     </script>
 </body>

@@ -135,7 +135,10 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
                     <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-800">Leads Ebook Terbaru (MOFU)</h3>
-                        <button class="text-sm text-green-600 hover:text-green-800 font-medium">Lihat Semua</button>
+                        <div class="flex gap-3">
+                            <button id="btn-export-csv" class="text-sm bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded flex items-center gap-2 transition shadow-sm font-medium"><i class="fas fa-file-csv"></i> Export CSV</button>
+                            <button class="text-sm text-gray-500 hover:text-green-800 font-medium px-2 py-1.5">Lihat Semua</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -195,6 +198,8 @@
 
     <!-- Script Fetch Data dari Database LDU via Web App Apps Script -->
     <script>
+        let globalLeadsData = []; // Menyimpan data leads untuk diexport
+
         document.addEventListener("DOMContentLoaded", async function() {
             const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
             
@@ -212,6 +217,7 @@
                     document.getElementById('stat-ip-unik').innerText = result.data.kunjungan.ipUnik || 0;
 
                     // 2. Render Tabel Leads Terbaru (MOFU)
+                    globalLeadsData = result.data.leads || [];
                     const tbody = document.getElementById('leads-table-body');
                     tbody.innerHTML = ""; 
                     
@@ -270,6 +276,30 @@
                 console.error("Fetch Error:", error);
                 document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Gagal terhubung ke Web App Endpoint.</td></tr>`;
             }
+        });
+
+        // Event Listener untuk Tombol Export CSV
+        document.getElementById('btn-export-csv').addEventListener('click', function() {
+            if (!globalLeadsData || globalLeadsData.length === 0) {
+                alert("Belum ada data leads untuk diekspor.");
+                return;
+            }
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Nama,WhatsApp,Persona AI,Waktu\n"; // Header CSV
+            
+            globalLeadsData.forEach(function(row) {
+                let rowData = `"${row.nama}","${row.whatsapp}","${row.persona}","${row.waktu}"`;
+                csvContent += rowData + "\r\n";
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Data_Leads_Ebook_LDU.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     </script>
 </body>

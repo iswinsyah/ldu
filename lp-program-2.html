@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urgent Program - Lumbung Dana Umat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans pb-16">
+    <nav class="bg-gray-800 shadow-md p-4 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold text-white text-lg"><span class="text-orange-500">LDU</span> Aksi Darurat</a>
+            <a href="#form-section" class="bg-orange-600 text-white px-5 py-2 rounded font-bold shadow hover:bg-orange-500">Bantu Sekarang</a>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 mt-8 flex flex-col md:flex-row gap-8">
+        <div class="md:w-2/3">
+            <div class="bg-red-600 text-white text-xs font-bold uppercase tracking-widest inline-block px-3 py-1 rounded-sm mb-4 animate-pulse">Sangat Mendesak</div>
+            <h1 id="prog-judul" class="text-3xl md:text-5xl font-extrabold text-white mb-6">Memuat...</h1>
+            <img id="prog-hero" src="https://via.placeholder.com/800x400" alt="Hero" class="w-full h-64 object-cover rounded-xl shadow-2xl mb-8 border border-gray-700">
+            
+            <!-- Carousel -->
+            <div class="overflow-hidden relative w-full mb-8 rounded-lg">
+                <div id="carousel-track" class="flex transition-transform duration-700 ease-in-out" style="width: 166.666%;">
+                    <div class="w-1/5 px-1"><img class="c-img w-full h-32 object-cover rounded" src=""></div>
+                    <div class="w-1/5 px-1"><img class="c-img w-full h-32 object-cover rounded" src=""></div>
+                    <div class="w-1/5 px-1"><img class="c-img w-full h-32 object-cover rounded" src=""></div>
+                    <div class="w-1/5 px-1"><img class="c-img w-full h-32 object-cover rounded" src=""></div>
+                    <div class="w-1/5 px-1"><img class="c-img w-full h-32 object-cover rounded" src=""></div>
+                </div>
+            </div>
+            <article id="prog-artikel" class="prose prose-invert max-w-none text-gray-300 leading-relaxed mb-8">Memuat cerita...</article>
+        </div>
+
+        <!-- Form di Sebelah Kanan (Desktop) -->
+        <div class="md:w-1/3">
+            <div id="form-section" class="bg-gray-800 p-6 rounded-xl border-t-4 border-orange-500 sticky top-24 shadow-2xl">
+                <div class="mb-6">
+                    <div class="flex justify-between text-sm mb-2"><span class="text-orange-400">Terkumpul Rp 0</span><span class="text-gray-400" id="prog-target">Target: Rp 0</span></div>
+                    <div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-orange-500 h-2 rounded-full" style="width: 15%"></div></div>
+                </div>
+                <h3 class="font-bold text-xl mb-4 text-white">Formulir Bantuan</h3>
+                <form id="form-donasi" class="space-y-4">
+                    <input type="hidden" id="donasi-program-id" value="">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" class="nom-btn border border-gray-600 bg-gray-700 text-gray-300 rounded py-2 text-sm hover:bg-orange-600 hover:border-orange-500 transition" data-val="100000">100 Ribu</button>
+                        <button type="button" class="nom-btn border border-gray-600 bg-gray-700 text-gray-300 rounded py-2 text-sm hover:bg-orange-600 hover:border-orange-500 transition" data-val="300000">300 Ribu</button>
+                    </div>
+                    <input type="number" id="donasi-nominal" required min="10000" class="w-full px-4 py-3 bg-gray-700 border-gray-600 rounded text-white" placeholder="Nominal lain">
+                    <div class="flex"><select id="donasi-sapaan" class="px-2 bg-gray-600 border-gray-600 rounded-l text-white"><option>Bpk</option><option>Ibu</option></select><input type="text" id="donasi-nama" required class="w-full px-3 py-3 bg-gray-700 border-gray-600 rounded-r text-white" placeholder="Nama"></div>
+                    <input type="tel" id="donasi-wa" required class="w-full px-4 py-3 bg-gray-700 border-gray-600 rounded text-white" placeholder="WhatsApp">
+                    <select id="donasi-metode" required class="w-full px-4 py-3 bg-gray-700 border-gray-600 rounded text-white"><option value="">-- Metode --</option><option>BSI</option><option>BCA</option><option>QRIS</option></select>
+                    <textarea id="donasi-doa" rows="2" class="w-full px-4 py-3 bg-gray-700 border-gray-600 rounded text-white" placeholder="Doa (Opsional)"></textarea>
+                    <button type="submit" class="w-full bg-orange-600 text-white font-bold py-4 rounded hover:bg-orange-500 transition">KIRIM BANTUAN</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Fetch & Carousel Logic sama persis dengan LP 1
+        document.addEventListener("DOMContentLoaded", async function() {
+            const progId = new URLSearchParams(window.location.search).get('id');
+            try {
+                const res = await fetch("https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec"); 
+                const result = await res.json();
+                const prog = result.data.programs.find(p => p.id == progId) || result.data.programs[0];
+                if(prog) {
+                    document.getElementById('prog-judul').innerText = prog.judul;
+                    document.getElementById('prog-hero').src = prog.url_gambar;
+                    document.getElementById('prog-target').innerText = "Target: Rp " + Number(prog.target_dana).toLocaleString('id-ID');
+                    document.getElementById('prog-artikel').innerHTML = prog.artikel.replace(/\n/g, '<br><br>');
+                    document.querySelectorAll('.c-img').forEach(img => img.src = prog.url_gambar);
+                    document.getElementById('donasi-program-id').value = prog.id;
+                }
+            } catch(e) {}
+        });
+
+        const track = document.getElementById('carousel-track'); let cIndex = 0;
+        setInterval(() => { cIndex++; if(cIndex > 2) cIndex = 0; track.style.transform = `translateX(-${cIndex * 20}%)`; }, 2500);
+
+        // Form UI
+        const nomBtns = document.querySelectorAll('.nom-btn');
+        const inputNominal = document.getElementById('donasi-nominal');
+        nomBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                nomBtns.forEach(b => { b.classList.remove('bg-orange-600', 'border-orange-500', 'text-white'); b.classList.add('bg-gray-700', 'text-gray-300'); });
+                this.classList.add('bg-orange-600', 'border-orange-500', 'text-white'); this.classList.remove('bg-gray-700', 'text-gray-300');
+                inputNominal.value = this.getAttribute('data-val');
+            });
+        });
+
+        document.getElementById('form-donasi').addEventListener('submit', async function(e) {
+            e.preventDefault(); const btn = this.querySelector('button[type="submit"]'); const ori = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Memproses...';
+            const payload = { type: 'tambah_donatur', program_id: document.getElementById('donasi-program-id').value, nominal: inputNominal.value, nama: document.getElementById('donasi-sapaan').value + ' ' + document.getElementById('donasi-nama').value, whatsapp: document.getElementById('donasi-wa').value, metode_pembayaran: document.getElementById('donasi-metode').value, doa: document.getElementById('donasi-doa').value };
+            try {
+                const res = await fetch("https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec", { method: 'POST', body: JSON.stringify(payload) });
+                const result = await res.json();
+                if(result.status === "success") { alert("Terima kasih atas kepedulian Anda!"); this.reset(); }
+            } catch(e) {}
+            btn.disabled = false; btn.innerHTML = ori;
+        });
+    </script>
+</body>
+</html>

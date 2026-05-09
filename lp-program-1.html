@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Program - Lumbung Dana Umat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans pb-16">
+    
+    <!-- Navbar Simpel -->
+    <nav class="bg-white shadow-sm p-4 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold text-green-700 text-lg flex items-center gap-2"><i class="fas fa-leaf bg-green-600 text-white p-2 rounded-full"></i> LDU</a>
+            <a href="#form-section" class="bg-yellow-500 text-green-900 px-5 py-2 rounded-full font-bold shadow-md hover:bg-yellow-400 transition">Donasi</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8">
+        <!-- Hero Title & Image -->
+        <div class="text-center mb-6">
+            <h1 id="prog-judul" class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4 leading-tight">Memuat Program...</h1>
+            <img id="prog-hero" src="https://via.placeholder.com/800x400" alt="Hero" class="w-full h-64 md:h-96 object-cover rounded-2xl shadow-lg">
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <div class="flex justify-between text-sm md:text-base mb-2">
+                <span class="font-bold text-green-600">Terkumpul: Rp 0</span>
+                <span class="text-gray-500">Target: <span id="prog-target">Rp 0</span></span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-green-500 h-3 rounded-full" style="width: 5%"></div>
+            </div>
+        </div>
+
+        <!-- Carousel 5 Gambar (Tampil 3 Berjalan) -->
+        <div class="overflow-hidden relative w-full mb-10">
+            <div id="carousel-track" class="flex transition-transform duration-700 ease-in-out" style="width: 166.666%;">
+                <!-- 5 Item (Masing-masing 20% dari total width track) -->
+                <div class="w-1/5 px-2"><img class="c-img w-full h-40 md:h-56 object-cover rounded-xl shadow-md" src=""></div>
+                <div class="w-1/5 px-2"><img class="c-img w-full h-40 md:h-56 object-cover rounded-xl shadow-md" src=""></div>
+                <div class="w-1/5 px-2"><img class="c-img w-full h-40 md:h-56 object-cover rounded-xl shadow-md" src=""></div>
+                <div class="w-1/5 px-2"><img class="c-img w-full h-40 md:h-56 object-cover rounded-xl shadow-md" src=""></div>
+                <div class="w-1/5 px-2"><img class="c-img w-full h-40 md:h-56 object-cover rounded-xl shadow-md" src=""></div>
+            </div>
+        </div>
+
+        <!-- Alasan Donasi & Cerita -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-center">
+            <div class="bg-green-50 p-4 rounded-xl"><i class="fas fa-exclamation-triangle text-3xl text-green-600 mb-2"></i><h4 class="font-bold">Mendesak</h4><p class="text-sm text-gray-600">Sangat butuh bantuan hari ini</p></div>
+            <div class="bg-green-50 p-4 rounded-xl"><i class="fas fa-shield-alt text-3xl text-green-600 mb-2"></i><h4 class="font-bold">Terpercaya</h4><p class="text-sm text-gray-600">Penyaluran dana transparan</p></div>
+            <div class="bg-green-50 p-4 rounded-xl"><i class="fas fa-praying-hands text-3xl text-green-600 mb-2"></i><h4 class="font-bold">Jariyah</h4><p class="text-sm text-gray-600">Pahala yang terus mengalir</p></div>
+        </div>
+
+        <article id="prog-artikel" class="prose prose-green max-w-none text-gray-700 leading-relaxed mb-10 bg-white p-6 md:p-8 rounded-2xl shadow-sm">
+            Memuat cerita...
+        </article>
+
+        <!-- Testimoni -->
+        <div class="bg-gray-100 p-6 rounded-2xl mb-10 border border-gray-200">
+            <h3 class="text-center font-bold text-xl mb-4">Apa Kata Donatur Sebelumnya?</h3>
+            <div class="space-y-3">
+                <div class="bg-white p-4 rounded-lg shadow-sm"><p class="italic text-gray-600 text-sm">"Alhamdulillah, merasa tenang karena laporannya selalu update."</p><p class="font-bold text-green-700 text-xs mt-2">- Bpk. Fulan</p></div>
+                <div class="bg-white p-4 rounded-lg shadow-sm"><p class="italic text-gray-600 text-sm">"Semoga sedikit rejeki ini bisa jadi pemberat amal kebaikan di akhirat kelak."</p><p class="font-bold text-green-700 text-xs mt-2">- Ibu Aisyah</p></div>
+            </div>
+        </div>
+
+        <!-- Formulir Donasi Langsung (Embedded) -->
+        <div id="form-section" class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-green-500">
+            <div class="bg-green-600 p-6 text-center text-white"><h2 class="text-2xl font-bold">Mulai Berdonasi</h2></div>
+            <form id="form-donasi" class="p-6 md:p-8 space-y-6">
+                <input type="hidden" id="donasi-program-id" value="">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-3">Pilih Nominal Donasi</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                        <button type="button" class="nom-btn border border-gray-300 rounded-lg py-2 hover:bg-green-50 transition font-medium" data-val="50000">Rp 50.000</button>
+                        <button type="button" class="nom-btn border border-gray-300 rounded-lg py-2 hover:bg-green-50 transition font-medium" data-val="100000">Rp 100.000</button>
+                        <button type="button" class="nom-btn border border-gray-300 rounded-lg py-2 hover:bg-green-50 transition font-medium" data-val="300000">Rp 300.000</button>
+                        <button type="button" class="nom-btn border border-gray-300 rounded-lg py-2 hover:bg-green-50 transition font-medium" data-val="500000">Rp 500.000</button>
+                    </div>
+                    <input type="number" id="donasi-nominal" required min="10000" class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 font-medium" placeholder="Atau ketik nominal lainnya (Min. 10.000)">
+                </div>
+                <div class="space-y-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Data Diri & Pembayaran</label>
+                    <div class="flex"><select id="donasi-sapaan" class="px-3 border border-gray-300 rounded-l-lg bg-gray-50"><option>Bapak</option><option>Ibu</option><option>Mas</option><option>Mbak</option></select><input type="text" id="donasi-nama" required class="w-full px-4 py-3 border border-gray-300 rounded-r-lg" placeholder="Nama Anda"></div>
+                    <input type="tel" id="donasi-wa" required class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nomor WhatsApp">
+                    <select id="donasi-metode" required class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white"><option value="">-- Pilih Metode Pembayaran --</option><option>BSI</option><option>BCA</option><option>Mandiri</option><option>GoPay</option><option>OVO</option><option>QRIS</option></select>
+                    <textarea id="donasi-doa" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Titipan Doa / Harapan (Opsional)"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-yellow-500 text-green-900 font-extrabold py-4 rounded-lg hover:bg-yellow-400 transition shadow-lg text-lg">Bismillah, Donasi Sekarang <i class="fas fa-heart ml-2"></i></button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Fetch Data Program
+        document.addEventListener("DOMContentLoaded", async function() {
+            const progId = new URLSearchParams(window.location.search).get('id');
+            const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+            try {
+                const res = await fetch(endpoint); const result = await res.json();
+                const prog = result.data.programs.find(p => p.id == progId) || result.data.programs[0];
+                if(prog) {
+                    document.getElementById('prog-judul').innerText = prog.judul;
+                    document.getElementById('prog-hero').src = prog.url_gambar;
+                    document.getElementById('prog-target').innerText = "Rp " + Number(prog.target_dana).toLocaleString('id-ID');
+                    document.getElementById('prog-artikel').innerHTML = prog.artikel.replace(/\n/g, '<br><br>');
+                    document.querySelectorAll('.c-img').forEach(img => img.src = prog.url_gambar);
+                    document.getElementById('donasi-program-id').value = prog.id;
+                }
+            } catch(e) {}
+        });
+
+        // Logika Carousel (Geser Kiri Tiap 3 Detik)
+        const track = document.getElementById('carousel-track');
+        let cIndex = 0;
+        setInterval(() => {
+            cIndex++; if(cIndex > 2) cIndex = 0; // Max geser 2 langkah karena tampil 3 dari 5
+            track.style.transform = `translateX(-${cIndex * 20}%)`;
+        }, 3000);
+
+        // Logika Form (Sama persis dengan donasi.html)
+        const nomBtns = document.querySelectorAll('.nom-btn');
+        const inputNominal = document.getElementById('donasi-nominal');
+        nomBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                nomBtns.forEach(b => { b.classList.remove('bg-green-100', 'border-green-500', 'text-green-800'); b.classList.add('border-gray-300'); });
+                this.classList.add('bg-green-100', 'border-green-500', 'text-green-800'); this.classList.remove('border-gray-300');
+                inputNominal.value = this.getAttribute('data-val');
+            });
+        });
+
+        document.getElementById('form-donasi').addEventListener('submit', async function(e) {
+            e.preventDefault(); const btn = this.querySelector('button[type="submit"]'); const ori = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Memproses... <i class="fas fa-spinner fa-spin"></i>';
+            const payload = { type: 'tambah_donatur', program_id: document.getElementById('donasi-program-id').value, nominal: inputNominal.value, nama: document.getElementById('donasi-sapaan').value + ' ' + document.getElementById('donasi-nama').value, whatsapp: document.getElementById('donasi-wa').value, metode_pembayaran: document.getElementById('donasi-metode').value, doa: document.getElementById('donasi-doa').value };
+            try {
+                const res = await fetch("https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec", { method: 'POST', body: JSON.stringify(payload) });
+                const result = await res.json();
+                if(result.status === "success") { alert("Alhamdulillah! Form donasi berhasil disubmit."); this.reset(); }
+            } catch(e) {}
+            btn.disabled = false; btn.innerHTML = ori;
+        });
+    </script>
+</body>
+</html>

@@ -30,7 +30,7 @@
                 <i class="fas fa-hand-holding-heart w-5"></i> Data Donatur
             </a>
             <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-bullhorn w-5"></i> Campaign / Program
+                <i class="fas fa-bullhorn w-5"></i> Program
             </a>
             <a href="#" id="nav-analis" onclick="switchTab('analis')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-brain w-5"></i> AI Analis Data
@@ -201,7 +201,7 @@
         <!-- Program Content (Awalnya Disembunyikan / Hidden) -->
         <div id="section-program" class="flex-1 overflow-y-auto p-6 hidden">
             <div class="mb-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-4">Manajemen Program Donasi</h3>
+                <h3 class="font-bold text-gray-800 text-lg mb-4">Manajemen Program</h3>
                 
                 <!-- Form Tambah Program -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
@@ -501,7 +501,7 @@
             // Ubah Judul Header
             const headerTitle = document.getElementById('header-title');
             if (tabName === 'dashboard') headerTitle.innerText = "Overview";
-            if (tabName === 'program') headerTitle.innerText = "Campaign / Program";
+            if (tabName === 'program') headerTitle.innerText = "Program";
             if (tabName === 'donatur') headerTitle.innerText = "Data Donatur";
             if (tabName === 'analis') headerTitle.innerText = "Laporan AI Analis Data";
         }

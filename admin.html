@@ -6,6 +6,8 @@
     <title>Dashboard Admin - Lumbung Dana Umat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Tambahkan library Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
 
@@ -102,7 +104,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Leads Ebook Masuk</p>
-                            <h3 class="text-2xl font-bold text-gray-800">1,240</h3>
+                            <h3 id="total-leads-stat" class="text-2xl font-bold text-gray-800">Memuat...</h3>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
                             <i class="fas fa-book"></i>
@@ -129,6 +131,22 @@
                 </div>
             </div>
 
+            <!-- Visitor Stats Area -->
+            <div class="mb-8">
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">Statistik Trafik Pengunjung</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Kunjungan -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-72">
+                        <canvas id="trafficChart"></canvas>
+                    </div>
+                    
+                    <!-- Proporsi Perangkat/Browser -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-72">
+                        <canvas id="browserChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- Data Tables Area -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Recent Leads Table -->
@@ -147,24 +165,9 @@
                                     <th class="px-6 py-3">Tanggal</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-sm">
-                                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-800">Mas Fulan</td>
-                                    <td class="px-6 py-4">08123456789</td>
-                                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Pekerja, Finansial</span></td>
-                                    <td class="px-6 py-4 text-gray-500">Baru saja</td>
-                                </tr>
-                                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-800">Mbak Siti</td>
-                                    <td class="px-6 py-4">08987654321</td>
-                                    <td class="px-6 py-4"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">Pengusaha, Tenang</span></td>
-                                    <td class="px-6 py-4 text-gray-500">1 jam lalu</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-800">Pak Budi</td>
-                                    <td class="px-6 py-4">08567890123</td>
-                                    <td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Hutang, Beban</span></td>
-                                    <td class="px-6 py-4 text-gray-500">3 jam lalu</td>
+                            <tbody id="leads-table-body" class="text-sm">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">Menyinkronkan data dengan database...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -188,5 +191,94 @@
             </div>
         </div>
     </main>
+
+    <!-- Script Fetch Data dari Database LDU via Web App Apps Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+            
+            try {
+                const response = await fetch(endpoint);
+                const result = await response.json();
+                
+                if (result.status === "success") {
+                    // 1. Update Jumlah Total Leads
+                    document.getElementById('total-leads-stat').innerText = result.data.totalLeads;
+
+                    // 2. Render Tabel Leads Terbaru
+                    const tbody = document.getElementById('leads-table-body');
+                    tbody.innerHTML = ""; 
+                    
+                    if (result.data.leads.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada leads yang masuk.</td></tr>';
+                    } else {
+                        result.data.leads.forEach(lead => {
+                            // Parse format waktu
+                            const waktu = new Date(lead.waktu.replace(" ", "T")).toLocaleString('id-ID', {
+                                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                            });
+                            
+                            const tr = document.createElement('tr');
+                            tr.className = "border-b border-gray-50 hover:bg-gray-50";
+                            tr.innerHTML = `
+                                <td class="px-6 py-4 font-medium text-gray-800">${lead.nama}</td>
+                                <td class="px-6 py-4">${lead.whatsapp}</td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">${lead.persona}</span>
+                                </td>
+                                <td class="px-6 py-4 text-gray-500">${waktu}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                } else {
+                    console.error("Kesalahan Database:", result.message);
+                    document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500 font-bold">Koneksi Database Gagal: ${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Gagal terhubung ke Web App Endpoint.</td></tr>`;
+            }
+
+            // --- Inisialisasi Grafik Chart.js (Data Mockup/Sementara) ---
+            // Nanti kita akan hubungkan grafik ini dengan data asli dari database
+            const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
+            new Chart(ctxTraffic, {
+                type: 'line',
+                data: {
+                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                    datasets: [{
+                        label: 'Kunjungan Harian',
+                        data: [12, 19, 15, 25, 22, 30, 45], // Angka visualisasi sementara
+                        borderColor: '#059669', // Warna hijau Tailwind
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctxBrowser = document.getElementById('browserChart').getContext('2d');
+            new Chart(ctxBrowser, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Chrome', 'Safari', 'Firefox', 'Lainnya'],
+                    datasets: [{
+                        data: [55, 25, 10, 10], // Angka visualisasi sementara
+                        backgroundColor: ['#10B981', '#34D399', '#6EE7B7', '#D1FAE5'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+
+        });
+    </script>
 </body>
 </html>

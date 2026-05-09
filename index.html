@@ -7,6 +7,36 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Mata Kustom LDU (Self-Hosted Tracking) -->
+    <script>
+        (async function() {
+            try {
+                let ip = 'Unknown', city = 'Unknown', country = 'Unknown';
+                // Mengambil IP dan Lokasi menggunakan API gratis
+                try {
+                    const ipRes = await fetch('https://ipapi.co/json/');
+                    if(ipRes.ok) {
+                        const ipData = await ipRes.json();
+                        ip = ipData.ip; city = ipData.city; country = ipData.country_name;
+                    }
+                } catch(e) {}
+
+                const trackData = {
+                    type: 'tracking',
+                    page: window.location.pathname || 'Home',
+                    referrer: document.referrer || 'Direct',
+                    userAgent: navigator.userAgent,
+                    ip: ip,
+                    city: city,
+                    country: country
+                };
+
+                const backendEndpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+                fetch(backendEndpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(trackData) });
+            } catch(err) {}
+        })();
+    </script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 

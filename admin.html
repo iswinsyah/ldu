@@ -68,97 +68,63 @@
         <!-- Dashboard Content -->
         <div class="flex-1 overflow-y-auto p-6">
             
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-sm text-gray-500 mb-1">Total Dana Masuk</p>
-                            <h3 class="text-2xl font-bold text-gray-800">Rp 12.5M</h3>
-                            <p class="text-sm text-gray-500 mb-1">Kunjungan Hari Ini</p>
-                            <h3 id="stat-kunjungan-today" class="text-2xl font-bold text-gray-800">...</h3>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                            <i class="fas fa-wallet"></i>
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                            <i class="fas fa-eye"></i>
-                        </div>
+            <!-- TOFU: Ringkasan Kunjungan -->
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-800 text-lg mb-4">Ringkasan Kunjungan (Data TOFU)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Harian</p>
+                        <h3 id="stat-harian" class="text-2xl font-bold text-gray-800">...</h3>
                     </div>
-                    <p class="text-xs text-green-500 font-medium flex items-center gap-1">
-                        <i class="fas fa-arrow-up"></i> +14.5% dari bulan lalu
-                    <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
-                        Trafik harian (TOFU)
-                    </p>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-sm text-gray-500 mb-1">Total Donatur</p>
-                            <h3 class="text-2xl font-bold text-gray-800">45,021</h3>
-                            <p class="text-sm text-gray-500 mb-1">Total Kunjungan</p>
-                            <h3 id="stat-total-kunjungan" class="text-2xl font-bold text-gray-800">...</h3>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                            <i class="fas fa-users"></i>
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Pekanan</p>
+                        <h3 id="stat-pekanan" class="text-2xl font-bold text-gray-800">...</h3>
                     </div>
-                    <p class="text-xs text-green-500 font-medium flex items-center gap-1">
-                        <i class="fas fa-arrow-up"></i> +212 donatur baru
-                    <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
-                        Seluruh halaman web
-                    </p>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-sm text-gray-500 mb-1">Leads Ebook Masuk</p>
-                            <h3 id="total-leads-stat" class="text-2xl font-bold text-gray-800">Memuat...</h3>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
-                            <i class="fas fa-book"></i>
-                        </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Bulanan</p>
+                        <h3 id="stat-bulanan" class="text-2xl font-bold text-gray-800">...</h3>
                     </div>
-                    <p class="text-xs text-green-500 font-medium flex items-center gap-1">
-                        <i class="fas fa-arrow-up"></i> +45 hari ini
-                    </p>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-sm text-gray-500 mb-1">Program Aktif</p>
-                            <h3 class="text-2xl font-bold text-gray-800">24</h3>
-                            <p class="text-sm text-gray-500 mb-1">Total IP Unik</p>
-                            <h3 id="stat-ip-unik" class="text-2xl font-bold text-gray-800">...</h3>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                            <i class="fas fa-clipboard-list"></i>
-                            <i class="fas fa-network-wired"></i>
-                        </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Tahunan</p>
+                        <h3 id="stat-tahunan" class="text-2xl font-bold text-gray-800">...</h3>
                     </div>
-                    <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
-                        Diperbarui 5 menit lalu
-                        Pengunjung individu
-                    </p>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Total Kunjungan</p>
+                        <h3 id="stat-total" class="text-2xl font-bold text-green-600">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Total IP Unik</p>
+                        <h3 id="stat-ip-unik" class="text-2xl font-bold text-blue-600">...</h3>
+                    </div>
                 </div>
             </div>
 
-            <!-- Visitor Stats Area -->
+            <!-- TOFU: Analitik Trafik & Teknologi -->
             <div class="mb-8">
-                <h3 class="font-bold text-gray-800 mb-4 text-lg">Statistik Trafik Pengunjung</h3>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Kunjungan -->
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">Analitik Trafik & Teknologi</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-72">
-                        <canvas id="trafficChart"></canvas>
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Tren Kunjungan (7 Hari Terakhir)</h4>
+                        <div class="h-56"><canvas id="trafficChart"></canvas></div>
                     </div>
-                    
-                    <!-- Proporsi Perangkat/Browser -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-72">
-                        <canvas id="browserChart"></canvas>
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Sumber Trafik (Referrer)</h4>
+                        <div class="h-56"><canvas id="sourceChart"></canvas></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-64">
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Browser</h4>
+                        <div class="h-48"><canvas id="browserChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-64">
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Sistem Operasi (OS)</h4>
+                        <div class="h-48"><canvas id="osChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-64">
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Perangkat</h4>
+                        <div class="h-48"><canvas id="deviceChart"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -168,7 +134,7 @@
                 <!-- Recent Leads Table -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
                     <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-800">Leads Ebook Terbaru</h3>
+                        <h3 class="font-bold text-gray-800">Leads Ebook Terbaru (MOFU)</h3>
                         <button class="text-sm text-green-600 hover:text-green-800 font-medium">Lihat Semua</button>
                     </div>
                     <div class="overflow-x-auto">
@@ -190,17 +156,36 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions / AI Agent Info -->
-                <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-xl shadow-sm text-white p-6">
-                    <h3 class="font-bold text-lg mb-2">Status AI Agent</h3>
-                    <p class="text-green-100 text-sm mb-6">Sistem Orkestrasi AI berjalan normal.</p>
-                    
-                    <div class="space-y-4">
-                        <div class="bg-green-900 bg-opacity-40 p-4 rounded-lg flex items-center justify-between">
-                            <div class="flex items-center gap-3"><i class="fas fa-robot text-yellow-400 text-xl"></i> <div><p class="font-medium">AI Agent 1 (CS)</p><p class="text-xs text-green-200">Aktif (Fonnte Terhubung)</p></div></div>
+                <div class="space-y-6">
+                    <!-- Top Locations Table -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h4 class="font-bold text-gray-700 mb-3">Top Lokasi Pengunjung</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="text-gray-500 border-b"><th class="pb-2">Kota, Negara</th><th class="pb-2 text-right">Jumlah Kunjungan</th></tr>
+                                </thead>
+                                <tbody id="location-table-body">
+                                    <tr><td colspan="2" class="py-2 text-center text-gray-400">Menyinkronkan data lokasi...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="bg-green-900 bg-opacity-40 p-4 rounded-lg flex items-center justify-between">
-                            <div class="flex items-center gap-3"><i class="fas fa-brain text-blue-400 text-xl"></i> <div><p class="font-medium">AI Agent 2 (Analis)</p><p class="text-xs text-green-200">Aktif (Gemini API)</p></div></div>
+                    </div>
+                    
+                    <!-- Quick Actions / AI Agent Info -->
+                    <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-xl shadow-sm text-white p-6">
+                        <h3 class="font-bold text-lg mb-2">Status AI Agent</h3>
+                        <p class="text-green-100 text-sm mb-4">Sistem Orkestrasi AI berjalan normal.</p>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-green-900 bg-opacity-40 p-3 rounded-lg flex items-center gap-3">
+                                <i class="fas fa-robot text-yellow-400 text-xl"></i> 
+                                <div><p class="font-medium text-sm">AI Agent 1 (CS)</p><p class="text-xs text-green-200">Aktif (Fonnte)</p></div>
+                            </div>
+                            <div class="bg-green-900 bg-opacity-40 p-3 rounded-lg flex items-center gap-3">
+                                <i class="fas fa-brain text-blue-400 text-xl"></i> 
+                                <div><p class="font-medium text-sm">AI Agent 2 (Analis)</p><p class="text-xs text-green-200">Aktif (Gemini)</p></div>
+                            </div>
                         </div>
                     </div>
                 </div>

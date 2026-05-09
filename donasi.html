@@ -64,7 +64,15 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Nama Lengkap</label>
-                                <input type="text" id="donasi-nama" required class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" placeholder="Nama Anda (Bisa disamarkan jika hamba Allah)">
+                                <div class="flex">
+                                    <select id="donasi-sapaan" class="px-3 py-3 border border-gray-300 border-r-0 rounded-l-lg bg-gray-50 focus:ring-green-500 focus:border-green-500 focus:z-10 text-sm text-gray-700 outline-none">
+                                        <option value="Bapak">Bapak</option>
+                                        <option value="Ibu">Ibu</option>
+                                        <option value="Mas">Mas</option>
+                                        <option value="Mbak">Mbak</option>
+                                    </select>
+                                    <input type="text" id="donasi-nama" required class="block w-full flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-green-500 focus:border-green-500 focus:z-10 outline-none" placeholder="Nama Anda (Bisa disamarkan jika hamba Allah)">
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Nomor WhatsApp</label>
@@ -147,7 +155,7 @@
                 type: 'tambah_donatur',
                 program_id: document.getElementById('donasi-program-id').value || null,
                 nominal: document.getElementById('donasi-nominal').value,
-                nama: document.getElementById('donasi-nama').value,
+                nama: document.getElementById('donasi-sapaan').value + ' ' + document.getElementById('donasi-nama').value,
                 whatsapp: document.getElementById('donasi-wa').value,
                 metode_pembayaran: document.getElementById('donasi-metode').value,
                 doa: document.getElementById('donasi-doa').value

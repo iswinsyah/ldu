@@ -219,5 +219,73 @@
             }
         });
     </script>
+
+    <!-- Script Fetch Program untuk Frontpage -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+            try {
+                const response = await fetch(endpoint);
+                const result = await response.json();
+                
+                if (result.status === "success" && result.data.programs) {
+                    const container = document.getElementById('program-container');
+                    let html = '';
+                    
+                    result.data.programs.forEach(p => {
+                        if(p.status === 'Aktif') {
+                            // Potong artikel untuk preview (maks 100 karakter)
+                            let preview = p.artikel.length > 100 ? p.artikel.substring(0, 100) + '...' : p.artikel;
+                            let target = Number(p.target_dana).toLocaleString('id-ID');
+                            let terkumpul = 0; // mockup terkumpul
+                            let persen = target > 0 ? Math.round((terkumpul / p.target_dana) * 100) : 0;
+                            
+                            html += `
+                            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col">
+                                <img src="${p.url_gambar}" alt="${p.judul}" class="w-full h-48 object-cover">
+                                <div class="p-6 flex-1 flex flex-col">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2">${p.judul}</h3>
+                                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">${preview}</p>
+                                    
+                                    <div class="mt-auto">
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="font-bold text-green-600">Terkumpul Rp ${terkumpul}</span>
+                                            <span class="text-gray-500">Target Rp ${target}</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: ${persen}%"></div>
+                                        </div>
+                                        <a href="#" class="block text-center w-full bg-green-50 text-green-700 font-bold py-2 rounded-md border border-green-200 hover:bg-green-600 hover:text-white transition">Donasi Sekarang</a>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        }
+                    });
+                    
+                    // Tambahkan Ebook statis di akhir (sebagai pelengkap Grid)
+                    html += `
+                    <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col relative border-2 border-yellow-400">
+                        <div class="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-bl-lg">GRATIS</div>
+                        <div class="bg-yellow-50 h-48 flex items-center justify-center">
+                            <i class="fas fa-book-open text-6xl text-yellow-600"></i>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">Ebook: 7 Kebiasaan Pembuka Rejeki ala Nabi</h3>
+                            <p class="text-sm text-gray-500 mb-4 line-clamp-2">Pelajari cara membuka pintu rejeki sesuai dengan sunnah Rasulullah SAW. Download gratis sekarang!</p>
+                            <div class="mt-auto pt-4 border-t border-gray-100">
+                                <a href="landingpage1.html" class="block text-center w-full bg-yellow-500 text-green-900 font-bold py-2 rounded-md hover:bg-yellow-400 transition">Dapatkan Ebooknya</a>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    
+                    container.innerHTML = html;
+                }
+            } catch (err) {
+                console.error("Gagal load program", err);
+            }
+        });
+    </script>
 </body>
 </html>

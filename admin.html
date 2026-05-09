@@ -327,6 +327,26 @@
                             locBody.innerHTML += `<tr class="border-b border-gray-50"><td class="py-2 text-gray-700">${loc.nama}</td><td class="py-2 text-right font-semibold">${loc.jml}</td></tr>`;
                         });
                     }
+                    
+                    // 5. Render Tabel Program di Tab Campaign
+                    const progBody = document.getElementById('program-table-body');
+                    progBody.innerHTML = "";
+                    if(!result.data.programs || result.data.programs.length === 0) {
+                        progBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada program yang diinput.</td></tr>';
+                    } else {
+                        result.data.programs.forEach(p => {
+                            const terkumpul = 0; // Sementara 0 sebelum fitur payment gateway
+                            progBody.innerHTML += `
+                                <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                    <td class="px-6 py-4 font-medium text-gray-800">${p.judul}</td>
+                                    <td class="px-6 py-4">Rp ${Number(p.target_dana).toLocaleString('id-ID')}</td>
+                                    <td class="px-6 py-4">Rp ${terkumpul.toLocaleString('id-ID')}</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">${p.status}</span>
+                                    </td>
+                                </tr>`;
+                        });
+                    }
                 } else {
                     console.error("Kesalahan Database:", result.message);
                     document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500 font-bold">Koneksi Database Gagal: ${result.message}</td></tr>`;

@@ -16,7 +16,8 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <!-- Logo LDU -->
-                    <a href="#" class="flex items-center gap-2">
+                    <!-- Tambahkan id="secret-logo" -->
+                    <a href="#" id="secret-logo" class="flex items-center gap-2">
                         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
                             <i class="fas fa-leaf"></i>
                         </div>
@@ -156,5 +157,37 @@
         <p>&copy; 2026 Lumbung Dana Umat. Terdaftar dan diawasi oleh Kemenag RI.</p>
     </footer>
 
+    <!-- Script Sakelar Rahasia Admin -->
+    <script>
+        let clickCount = 0;
+        let clickTimer;
+
+        document.getElementById('secret-logo').addEventListener('click', function(e) {
+            e.preventDefault(); // Mencegah halaman scroll ke atas
+            
+            clickCount++;
+
+            // Mulai timer pada klik pertama. Jika dalam 1.5 detik tidak mencapai 3 klik, reset ke 0.
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 1500); 
+            }
+
+            // Jika berhasil klik 3 kali sebelum waktu habis
+            if (clickCount === 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0; // Reset
+                
+                // Munculkan prompt password
+                const pwd = prompt("Sistem Keamanan LDU.\nMasukkan Password Admin:");
+                if (pwd === "Bismillah99!") {
+                    window.location.href = "admin.html"; // Arahkan ke dashboard
+                } else if (pwd !== null) {
+                    alert("Akses Ditolak! Password salah.");
+                }
+            }
+        });
+    </script>
 </body>
 </html>

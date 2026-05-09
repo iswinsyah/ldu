@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Lumbung Dana Umat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-green-900 text-white flex flex-col hidden md:flex">
+        <div class="h-16 flex items-center px-6 border-b border-green-800">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-leaf text-xl text-yellow-400"></i>
+                <span class="font-bold text-xl tracking-wide">LDU Admin</span>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <a href="#" class="flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium">
+                <i class="fas fa-chart-pie w-5"></i> Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
+                <i class="fas fa-users w-5"></i> Data Leads Ebook
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
+                <i class="fas fa-hand-holding-heart w-5"></i> Data Donatur
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
+                <i class="fas fa-bullhorn w-5"></i> Campaign / Program
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
+                <i class="fas fa-cog w-5"></i> Pengaturan
+            </a>
+        </nav>
+        <div class="p-4 border-t border-green-800">
+            <a href="index.html" class="flex items-center gap-3 px-4 py-2 text-green-300 hover:text-white transition">
+                <i class="fas fa-sign-out-alt w-5"></i> Keluar
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-gray-500 hover:text-green-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h2 class="text-xl font-bold text-gray-800">Overview</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="text-gray-400 hover:text-green-600 relative">
+                    <i class="far fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">3</span>
+                </button>
+                <div class="flex items-center gap-2 border-l pl-4 border-gray-200">
+                    <img src="https://ui-avatars.com/api/?name=Admin+Bos&background=0D8ABC&color=fff" alt="Admin" class="w-8 h-8 rounded-full">
+                    <span class="font-medium text-sm hidden sm:block">Admin Bos</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="flex-1 overflow-y-auto p-6">
+            
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Dana Masuk</p>
+                            <h3 class="text-2xl font-bold text-gray-800">Rp 12.5M</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-green-500 font-medium flex items-center gap-1">
+                        <i class="fas fa-arrow-up"></i> +14.5% dari bulan lalu
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Donatur</p>
+                            <h3 class="text-2xl font-bold text-gray-800">45,021</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-green-500 font-medium flex items-center gap-1">
+                        <i class="fas fa-arrow-up"></i> +212 donatur baru
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Leads Ebook Masuk</p>
+                            <h3 class="text-2xl font-bold text-gray-800">1,240</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-green-500 font-medium flex items-center gap-1">
+                        <i class="fas fa-arrow-up"></i> +45 hari ini
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Program Aktif</p>
+                            <h3 class="text-2xl font-bold text-gray-800">24</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
+                        Diperbarui 5 menit lalu
+                    </p>
+                </div>
+            </div>
+
+            <!-- Data Tables Area -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Leads Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Leads Ebook Terbaru</h3>
+                        <button class="text-sm text-green-600 hover:text-green-800 font-medium">Lihat Semua</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                    <th class="px-6 py-3">Nama</th>
+                                    <th class="px-6 py-3">WhatsApp</th>
+                                    <th class="px-6 py-3">Persona AI</th>
+                                    <th class="px-6 py-3">Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                    <td class="px-6 py-4 font-medium text-gray-800">Mas Fulan</td>
+                                    <td class="px-6 py-4">08123456789</td>
+                                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Pekerja, Finansial</span></td>
+                                    <td class="px-6 py-4 text-gray-500">Baru saja</td>
+                                </tr>
+                                <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                    <td class="px-6 py-4 font-medium text-gray-800">Mbak Siti</td>
+                                    <td class="px-6 py-4">08987654321</td>
+                                    <td class="px-6 py-4"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">Pengusaha, Tenang</span></td>
+                                    <td class="px-6 py-4 text-gray-500">1 jam lalu</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 font-medium text-gray-800">Pak Budi</td>
+                                    <td class="px-6 py-4">08567890123</td>
+                                    <td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Hutang, Beban</span></td>
+                                    <td class="px-6 py-4 text-gray-500">3 jam lalu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Actions / AI Agent Info -->
+                <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-xl shadow-sm text-white p-6">
+                    <h3 class="font-bold text-lg mb-2">Status AI Agent</h3>
+                    <p class="text-green-100 text-sm mb-6">Sistem Orkestrasi AI berjalan normal.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-green-900 bg-opacity-40 p-4 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-3"><i class="fas fa-robot text-yellow-400 text-xl"></i> <div><p class="font-medium">AI Agent 1 (CS)</p><p class="text-xs text-green-200">Aktif (Fonnte Terhubung)</p></div></div>
+                        </div>
+                        <div class="bg-green-900 bg-opacity-40 p-4 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-3"><i class="fas fa-brain text-blue-400 text-xl"></i> <div><p class="font-medium">AI Agent 2 (Analis)</p><p class="text-xs text-green-200">Aktif (Gemini API)</p></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

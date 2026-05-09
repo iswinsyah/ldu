@@ -32,6 +32,9 @@
             <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-bullhorn w-5"></i> Campaign / Program
             </a>
+            <a href="#" id="nav-analis" onclick="switchTab('analis')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
+                <i class="fas fa-brain w-5"></i> AI Analis Data
+            </a>
             <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
                 <i class="fas fa-cog w-5"></i> Pengaturan
             </a>
@@ -283,6 +286,35 @@
                 </div>
             </div>
         </div>
+
+        <!-- Analis Content (Awalnya Disembunyikan / Hidden) -->
+        <div id="section-analis" class="flex-1 overflow-y-auto p-6 hidden">
+            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h3 class="font-bold text-gray-800 text-lg">AI Agent: Analis Data Persona</h3>
+                <button id="btn-run-analysis" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow font-medium transition flex items-center">
+                    <i class="fas fa-magic mr-2"></i> Mulai Analisa Sekarang
+                </button>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex items-center">
+                <i class="fas fa-info-circle text-xl mr-3"></i> AI Agent ini secara otomatis bekerja setiap tanggal 1 awal bulan untuk menganalisa seluruh data pengunjung (TOFU), leads (MOFU), dan donatur (BOFU).
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h4 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-users text-gray-400 mr-2"></i> TOFU Persona (Trafik)</h4>
+                    <p id="analis-tofu" class="text-sm text-gray-600 italic leading-relaxed">Belum ada data analisa. Silakan klik "Mulai Analisa Sekarang".</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h4 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-book-reader text-yellow-500 mr-2"></i> MOFU Persona (Leads)</h4>
+                    <p id="analis-mofu" class="text-sm text-gray-600 italic leading-relaxed">Belum ada data analisa.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h4 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-hand-holding-heart text-green-500 mr-2"></i> BOFU Persona (Donatur)</h4>
+                    <p id="analis-bofu" class="text-sm text-gray-600 italic leading-relaxed">Belum ada data analisa.</p>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Script Fetch Data dari Database LDU via Web App Apps Script -->
@@ -404,6 +436,13 @@
                                 </tr>`;
                         });
                     }
+                    
+                    // 7. Render Data Analisa AI Terakhir
+                    if(result.data.latestAnalysis && result.data.latestAnalysis.tofu) {
+                        document.getElementById('analis-tofu').innerHTML = result.data.latestAnalysis.tofu.replace(/\n/g, '<br><br>');
+                        document.getElementById('analis-mofu').innerHTML = result.data.latestAnalysis.mofu.replace(/\n/g, '<br><br>');
+                        document.getElementById('analis-bofu').innerHTML = result.data.latestAnalysis.bofu.replace(/\n/g, '<br><br>');
+                    }
                 } else {
                     console.error("Kesalahan Database:", result.message);
                     document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500 font-bold">Koneksi Database Gagal: ${result.message}</td></tr>`;
@@ -444,6 +483,7 @@
             document.getElementById('section-dashboard').classList.add('hidden');
             document.getElementById('section-program').classList.add('hidden');
             document.getElementById('section-donatur').classList.add('hidden');
+            document.getElementById('section-analis').classList.add('hidden');
             
             // Reset style semua nav
             const navClasses = "flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer";
@@ -452,6 +492,7 @@
             document.getElementById('nav-dashboard').className = navClasses;
             document.getElementById('nav-program').className = navClasses;
             document.getElementById('nav-donatur').className = navClasses;
+            document.getElementById('nav-analis').className = navClasses;
             
             // Munculkan section yang dipilih dan beri warna aktif pada nav-nya
             document.getElementById('section-' + tabName).classList.remove('hidden');
@@ -462,8 +503,35 @@
             if (tabName === 'dashboard') headerTitle.innerText = "Overview";
             if (tabName === 'program') headerTitle.innerText = "Campaign / Program";
             if (tabName === 'donatur') headerTitle.innerText = "Data Donatur";
+            if (tabName === 'analis') headerTitle.innerText = "Laporan AI Analis Data";
         }
 
+        // Event Listener Tombol Mulai Analisa AI
+        document.getElementById('btn-run-analysis').addEventListener('click', async function() {
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI Sedang Menganalisa...';
+            
+            try {
+                const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+                const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ type: 'run_analysis' }) });
+                const result = await response.json();
+                
+                if(result.status === "success") {
+                    document.getElementById('analis-tofu').innerHTML = result.data.tofu.replace(/\n/g, '<br><br>');
+                    document.getElementById('analis-mofu').innerHTML = result.data.mofu.replace(/\n/g, '<br><br>');
+                    document.getElementById('analis-bofu').innerHTML = result.data.bofu.replace(/\n/g, '<br><br>');
+                    alert("Alhamdulillah! Analisa AI Agent selesai.");
+                } else {
+                    alert("Gagal melakukan analisa: " + result.message);
+                }
+            } catch (error) {
+                alert("Terjadi kesalahan saat memanggil AI: " + error.message);
+            } finally {
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }
+        });
         // Event Listener Form Program (Mengirim data ke Database via GAS)
         document.getElementById('form-program').addEventListener('submit', async function(e) {
             e.preventDefault();

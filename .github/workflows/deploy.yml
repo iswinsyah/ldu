@@ -21,8 +21,8 @@ jobs:
       - name: Deploy to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          # Alamat server FTP Hostinger. Ambil dari 'FTP Accounts' di hPanel.
-          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          # GANTI tulisan "ISI_DENGAN_IP_ATAU_FTP_HOSTINGER" dengan alamat aslinya. Contoh: 194.168.1.100 atau ftp.namadomainbos.com
+          server: ISI_DENGAN_IP_ATAU_FTP_HOSTINGER
           
           # Username akun FTP Hostinger.
           username: ${{ secrets.HOSTINGER_FTP_USERNAME }}

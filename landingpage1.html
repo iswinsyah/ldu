@@ -45,6 +45,27 @@
                     <label for="wa" class="block text-sm font-medium text-gray-700">Nomor WhatsApp (Aktif)</label>
                     <input type="tel" id="wa" required placeholder="08123456789" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
                 </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="gender" class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
+                        <select id="gender" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white">
+                            <option value="">-- Pilih --</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="usia" class="block text-sm font-medium text-gray-700">Rentang Usia</label>
+                        <select id="usia" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white">
+                            <option value="">-- Pilih --</option>
+                            <option value="< 20 Tahun">< 20 Tahun</option>
+                            <option value="20 - 30 Tahun">20 - 30 Tahun</option>
+                            <option value="31 - 40 Tahun">31 - 40 Tahun</option>
+                            <option value="> 40 Tahun">> 40 Tahun</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <!-- Data Umpan untuk AI Agent 2 (Analis Data Buyer Persona) -->
                 <div>
@@ -82,6 +103,8 @@
             const leadData = {
                 nama: document.getElementById('nama').value,
                 whatsapp: document.getElementById('wa').value,
+                gender: document.getElementById('gender').value,
+                usia: document.getElementById('usia').value,
                 harapan_user: document.getElementById('pain_point').value
             };
 

@@ -17,10 +17,10 @@ function doPost(e) {
     const FONNTE_API_KEY = scriptProperties.getProperty('FONNTE_API_KEY');
 
     // 2. Ambil data yang dikirim oleh form di landingpage1.html
-    const { nama, whatsapp, harapan_user } = JSON.parse(e.postData.contents);
+    const { nama, whatsapp, gender, usia, harapan_user } = JSON.parse(e.postData.contents);
 
     // Validasi data dasar
-    if (!nama || !whatsapp || !harapan_user) {
+    if (!nama || !whatsapp || !harapan_user || !gender || !usia) {
       return createJsonResponse({ message: "Data tidak lengkap." });
     }
 
@@ -30,6 +30,8 @@ function doPost(e) {
     Logger.log("🧠 AI Agent 2 (Analis) mulai bekerja...");
     const promptAnalis = `Sebagai seorang analis marketing spiritual, analisis data calon donatur ini:
     - Nama: ${nama}
+    - Jenis Kelamin: ${gender}
+    - Usia: ${usia}
     - Harapan Terbesar: "${harapan_user}"
     Tentukan Buyer Persona-nya dalam 3 kata kunci (contoh: Pekerja, Beban Finansial, Butuh Ketenangan).`;
     
@@ -63,8 +65,20 @@ function doPost(e) {
     const ideKonten = JSON.parse(ideKontenRaw.replace(/```json|```/g, ''));
     Logger.log(`-> Ide konten baru dibuat: ${ideKonten.title}`);
 
-    // TODO: Simpan 'ideKonten' ini ke dalam Google Sheets
-    // SpreadsheetApp.openById('SHEET_ID').getSheetByName('Ide Konten').appendRow([new Date(), ideKonten.title, ideKonten.script, ideKonten.visual_idea]);
+    // =================================================================
+    // SIMPAN SEMUA DATA KE GOOGLE SHEETS
+    // =================================================================
+    try {
+      const SPREADSHEET_ID = scriptProperties.getProperty('SPREADSHEET_ID');
+      const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Data Leads');
+      
+      // Pastikan di Google Sheets Bos, urutan kolom sesuai: 
+      // Waktu | Nama | WA | Gender | Usia | Harapan | Persona | Judul Konten | Script | Ide Visual
+      sheet.appendRow([new Date(), nama, whatsapp, gender, usia, harapan_user, buyerPersona, ideKonten.title, ideKonten.script, ideKonten.visual_idea]);
+      Logger.log("✅ Data berhasil disimpan ke Google Sheets.");
+    } catch (e) {
+      Logger.log("❌ Gagal menyimpan ke Google Sheets: " + e.toString());
+    }
 
     // Kirim respon sukses kembali ke landing page
     return createJsonResponse({ message: "Proses funneling berhasil dijalankan!" });

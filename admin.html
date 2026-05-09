@@ -384,11 +384,41 @@
             if (tabName === 'program') headerTitle.innerText = "Campaign / Program";
         }
 
-        // Event Listener Form Program (Sementara UI / Mock)
-        document.getElementById('form-program').addEventListener('submit', function(e) {
+        // Event Listener Form Program (Mengirim data ke Database via GAS)
+        document.getElementById('form-program').addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert("Form Program UI berfungsi! Nanti data ini akan dikirim ke MySQL untuk ditampilkan di Frontpage.");
-            this.reset();
+            
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = 'Menyimpan... <i class="fas fa-spinner fa-spin ml-2"></i>';
+
+            const payload = {
+                type: 'tambah_program',
+                judul: document.getElementById('prog-judul').value,
+                target_dana: document.getElementById('prog-target').value,
+                url_gambar: document.getElementById('prog-gambar').value,
+                artikel: document.getElementById('prog-artikel').value
+            };
+
+            try {
+                const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+                const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                
+                if (result.status === "success" || result.message === "Program berhasil ditambahkan.") {
+                    alert("Alhamdulillah! Program berhasil diterbitkan.");
+                    this.reset();
+                } else {
+                    alert("Gagal menyimpan program: " + (result.message || "Unknown error"));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Terjadi kesalahan jaringan saat menyimpan program.");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalText;
+            }
         });
     </script>
 </body>

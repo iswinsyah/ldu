@@ -75,13 +75,19 @@
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Total Dana Masuk</p>
                             <h3 class="text-2xl font-bold text-gray-800">Rp 12.5M</h3>
+                            <p class="text-sm text-gray-500 mb-1">Kunjungan Hari Ini</p>
+                            <h3 id="stat-kunjungan-today" class="text-2xl font-bold text-gray-800">...</h3>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                             <i class="fas fa-wallet"></i>
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-eye"></i>
                         </div>
                     </div>
                     <p class="text-xs text-green-500 font-medium flex items-center gap-1">
                         <i class="fas fa-arrow-up"></i> +14.5% dari bulan lalu
+                    <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
+                        Trafik harian (TOFU)
                     </p>
                 </div>
 
@@ -90,13 +96,19 @@
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Total Donatur</p>
                             <h3 class="text-2xl font-bold text-gray-800">45,021</h3>
+                            <p class="text-sm text-gray-500 mb-1">Total Kunjungan</p>
+                            <h3 id="stat-total-kunjungan" class="text-2xl font-bold text-gray-800">...</h3>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
                             <i class="fas fa-users"></i>
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                            <i class="fas fa-chart-line"></i>
                         </div>
                     </div>
                     <p class="text-xs text-green-500 font-medium flex items-center gap-1">
                         <i class="fas fa-arrow-up"></i> +212 donatur baru
+                    <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
+                        Seluruh halaman web
                     </p>
                 </div>
 
@@ -120,13 +132,17 @@
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Program Aktif</p>
                             <h3 class="text-2xl font-bold text-gray-800">24</h3>
+                            <p class="text-sm text-gray-500 mb-1">Total IP Unik</p>
+                            <h3 id="stat-ip-unik" class="text-2xl font-bold text-gray-800">...</h3>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                             <i class="fas fa-clipboard-list"></i>
+                            <i class="fas fa-network-wired"></i>
                         </div>
                     </div>
                     <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
                         Diperbarui 5 menit lalu
+                        Pengunjung individu
                     </p>
                 </div>
             </div>
@@ -202,10 +218,15 @@
                 const result = await response.json();
                 
                 if (result.status === "success") {
-                    // 1. Update Jumlah Total Leads
-                    document.getElementById('total-leads-stat').innerText = result.data.totalLeads;
+                    // 1. Update Kartu Statistik Kunjungan Atas
+                    document.getElementById('stat-harian').innerText = result.data.kunjungan.harian || 0;
+                    document.getElementById('stat-pekanan').innerText = result.data.kunjungan.pekanan || 0;
+                    document.getElementById('stat-bulanan').innerText = result.data.kunjungan.bulanan || 0;
+                    document.getElementById('stat-tahunan').innerText = result.data.kunjungan.tahunan || 0;
+                    document.getElementById('stat-total').innerText = result.data.kunjungan.total || 0;
+                    document.getElementById('stat-ip-unik').innerText = result.data.kunjungan.ipUnik || 0;
 
-                    // 2. Render Tabel Leads Terbaru
+                    // 2. Render Tabel Leads Terbaru (MOFU)
                     const tbody = document.getElementById('leads-table-body');
                     tbody.innerHTML = ""; 
                     
@@ -213,22 +234,47 @@
                         tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada leads yang masuk.</td></tr>';
                     } else {
                         result.data.leads.forEach(lead => {
-                            // Parse format waktu
                             const waktu = new Date(lead.waktu.replace(" ", "T")).toLocaleString('id-ID', {
                                 day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                             });
-                            
                             const tr = document.createElement('tr');
                             tr.className = "border-b border-gray-50 hover:bg-gray-50";
                             tr.innerHTML = `
                                 <td class="px-6 py-4 font-medium text-gray-800">${lead.nama}</td>
                                 <td class="px-6 py-4">${lead.whatsapp}</td>
-                                <td class="px-6 py-4">
-                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">${lead.persona}</span>
-                                </td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">${lead.persona}</span></td>
                                 <td class="px-6 py-4 text-gray-500">${waktu}</td>
                             `;
                             tbody.appendChild(tr);
+                        });
+                    }
+
+                    // 3. Render Grafik (TOFU)
+                    const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } };
+                    const colors = ['#10B981', '#3B82F6', '#F59E0B', '#F43F5E', '#8B5CF6', '#6366F1'];
+
+                    new Chart(document.getElementById('trafficChart'), { type: 'line', data: {
+                        labels: result.data.chartTraffic.labels,
+                        datasets: [{ label: 'Kunjungan Harian', data: result.data.chartTraffic.data, borderColor: '#059669', backgroundColor: 'rgba(5, 150, 105, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }]
+                    }, options: { responsive: true, maintainAspectRatio: false }});
+
+                    new Chart(document.getElementById('sourceChart'), { type: 'bar', data: {
+                        labels: result.data.chartSource.labels,
+                        datasets: [{ label: 'Sumber Trafik', data: result.data.chartSource.data, backgroundColor: colors }]
+                    }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }});
+
+                    new Chart(document.getElementById('browserChart'), { type: 'doughnut', data: { labels: result.data.chartBrowser.labels, datasets: [{ data: result.data.chartBrowser.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
+                    new Chart(document.getElementById('osChart'), { type: 'doughnut', data: { labels: result.data.chartOs.labels, datasets: [{ data: result.data.chartOs.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
+                    new Chart(document.getElementById('deviceChart'), { type: 'doughnut', data: { labels: result.data.chartDevice.labels, datasets: [{ data: result.data.chartDevice.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
+
+                    // 4. Render Table Lokasi
+                    const locBody = document.getElementById('location-table-body');
+                    locBody.innerHTML = "";
+                    if(result.data.topLocations.length === 0) {
+                        locBody.innerHTML = '<tr><td colspan="2" class="py-2 text-center text-gray-400">Belum ada data lokasi</td></tr>';
+                    } else {
+                        result.data.topLocations.forEach(loc => {
+                            locBody.innerHTML += `<tr class="border-b border-gray-50"><td class="py-2 text-gray-700">${loc.nama}</td><td class="py-2 text-right font-semibold">${loc.jml}</td></tr>`;
                         });
                     }
                 } else {
@@ -239,45 +285,6 @@
                 console.error("Fetch Error:", error);
                 document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Gagal terhubung ke Web App Endpoint.</td></tr>`;
             }
-
-            // --- Inisialisasi Grafik Chart.js (Data Mockup/Sementara) ---
-            // Nanti kita akan hubungkan grafik ini dengan data asli dari database
-            const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
-            new Chart(ctxTraffic, {
-                type: 'line',
-                data: {
-                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
-                    datasets: [{
-                        label: 'Kunjungan Harian',
-                        data: [12, 19, 15, 25, 22, 30, 45], // Angka visualisasi sementara
-                        borderColor: '#059669', // Warna hijau Tailwind
-                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            const ctxBrowser = document.getElementById('browserChart').getContext('2d');
-            new Chart(ctxBrowser, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Chrome', 'Safari', 'Firefox', 'Lainnya'],
-                    datasets: [{
-                        data: [55, 25, 10, 10], // Angka visualisasi sementara
-                        backgroundColor: ['#10B981', '#34D399', '#6EE7B7', '#D1FAE5'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right' } }
-                }
-            });
-
         });
     </script>
 </body>

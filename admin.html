@@ -613,6 +613,48 @@
                 }
             }
         }
+
+    // Logika AI Program Generator (Sistem Oper Data Otomatis)
+    document.getElementById('btn-generate').addEventListener('click', function() {
+        const prompt = document.getElementById('gen-prompt').value;
+        if(!prompt) return alert("Silakan masukkan ide program dulu, Bos!");
+        
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI Sedang Menulis...';
+        
+        // SIMULASI: Nanti ini akan kita koneksikan ke Gemini API di Google Apps Script
+        setTimeout(() => {
+            // Hasil yang dibuat oleh AI
+            const aiResponse = {
+                judul: "Bantuan Mendesak: Sembako & Obat untuk Korban Banjir Demak",
+                target: "50000000",
+                gambar: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&q=80",
+                artikel: "Banjir bandang telah merendam ribuan rumah di wilayah Demak. Banyak keluarga yang terpaksa mengungsi hanya dengan pakaian di badan.\n\nMari ulurkan tangan kita untuk membantu saudara-saudara kita yang terdampak. Dana yang terkumpul akan disalurkan dalam bentuk:\n1. Makanan Siap Saji\n2. Obat-obatan & Vitamin\n3. Pakaian Layak Pakai & Selimut\n\nSetiap Rupiah dari Anda sangat berarti bagi mereka yang sedang kedinginan dan kelaparan."
+            };
+
+            document.getElementById('res-judul').innerText = aiResponse.judul;
+            document.getElementById('res-target').innerText = aiResponse.target;
+            document.getElementById('res-gambar').innerText = aiResponse.gambar;
+            document.getElementById('res-artikel').innerText = aiResponse.artikel;
+            
+            document.getElementById('gen-result').classList.remove('hidden');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }, 2000); // Simulasi waktu loading 2 detik
+    });
+
+    document.getElementById('btn-use-draft').addEventListener('click', function() {
+        // OTOMATIS: Pindahkan data dari AI langsung ke Form Program (Tanpa Copy Paste)
+        document.getElementById('prog-judul').value = document.getElementById('res-judul').innerText;
+        document.getElementById('prog-target').value = document.getElementById('res-target').innerText;
+        document.getElementById('prog-gambar').value = document.getElementById('res-gambar').innerText;
+        document.getElementById('prog-artikel').value = document.getElementById('res-artikel').innerText;
+        
+        // Pindah otomatis ke Menu Program agar siap di-Klik Terbitkan
+        switchTab('program');
+    });
     </script>
 </body>
 </html>

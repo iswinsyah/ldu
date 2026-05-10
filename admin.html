@@ -602,6 +602,38 @@
                 this.innerHTML = originalText;
             }
         });
+
+        // Event Listener Tombol Riset Pasar Eksternal (Agen 1)
+        document.getElementById('btn-run-research').addEventListener('click', async function() {
+            const topic = document.getElementById('research-topic').value;
+            if(!topic) return alert("Silakan masukkan topik riset terlebih dahulu, Bos!");
+
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sedang Riset...';
+            
+            const resContainer = document.getElementById('research-result');
+            resContainer.classList.remove('hidden');
+            resContainer.innerHTML = '<span class="text-gray-500 italic"><i class="fas fa-brain text-blue-400 mr-2"></i> Agen 1 sedang membaca literatur dan mensintesis data... mohon tunggu sekitar 5-10 detik.</span>';
+
+            try {
+                const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+                const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ type: 'run_research', topic: topic }) });
+                const result = await response.json();
+                
+                if(result.status === "success") {
+                    resContainer.innerHTML = result.data.replace(/\n/g, '<br>');
+                } else {
+                    resContainer.innerHTML = "<span class='text-red-500 font-bold'>Gagal riset: " + result.message + "</span>";
+                }
+            } catch (error) {
+                resContainer.innerHTML = "<span class='text-red-500 font-bold'>Terjadi kesalahan koneksi.</span>";
+            } finally {
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }
+        });
+
         // Event Listener Form Program (Mengirim data ke Database via GAS)
         document.getElementById('form-program').addEventListener('submit', async function(e) {
             e.preventDefault();

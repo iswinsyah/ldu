@@ -1,0 +1,26 @@
+name: Auto Deploy ke Hostinger
+
+on:
+  push:
+    branches:
+      - main # Akan berjalan otomatis setiap ada push ke branch main
+
+jobs:
+  web-deploy:
+    name: Mengirim File
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mengambil kode terbaru
+        uses: actions/checkout@v4
+      
+      - name: Mengunggah ke Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**

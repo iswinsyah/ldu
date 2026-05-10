@@ -25,7 +25,7 @@ $host = "localhost"; // Biarkan localhost karena 1 server
 $user = "u829486010_ldu"; 
 
 // !!! SANGAT PENTING: GANTI TULISAN DI BAWAH INI DENGAN PASSWORD DATABASE ASLI BOS !!!
-$pass = "PASSWORD_DATABASE_BOS"; 
+$pass = "LDUKotaBatu2026!"; 
 
 $dbname = "u829486010_ldu"; 
 

@@ -211,9 +211,9 @@
                 
                 // Munculkan prompt password
                 const pwd = prompt("Sistem Keamanan LDU.\nMasukkan Password Admin:");
-                if (pwd === "LDUKotaBatu2026!") {
+                if (pwd !== null && pwd.trim() === "LDUKotaBatu2026!") {
                     window.location.href = "admin.html"; // Arahkan ke dashboard
-                } else if (pwd !== null) {
+                } else if (pwd !== null && pwd.trim() !== "") {
                     alert("Akses Ditolak! Password salah.");
                 }
             }

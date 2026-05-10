@@ -33,10 +33,10 @@
                 <i class="fas fa-bullhorn w-5"></i> Program
             </a>
             <a href="#" id="nav-generator" onclick="switchTab('generator')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-magic w-5"></i> AI Program Generator
+                <i class="fas fa-magic w-5"></i> Agen 2 Program
             </a>
             <a href="#" id="nav-analis" onclick="switchTab('analis')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-brain w-5"></i> AI Analis Data
+                <i class="fas fa-brain w-5"></i> Agen 1 Analis
             </a>
             <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
                 <i class="fas fa-cog w-5"></i> Pengaturan
@@ -204,7 +204,7 @@
         <!-- Generator Content (Awalnya Disembunyikan / Hidden) -->
         <div id="section-generator" class="flex-1 overflow-y-auto p-6 hidden">
             <div class="mb-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-4">AI Program Generator</h3>
+                <h3 class="font-bold text-gray-800 text-lg mb-4">Agen 2 Program</h3>
                 
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
                     <h4 class="font-bold text-gray-700 mb-4"><i class="fas fa-robot text-blue-500 mr-2"></i>Buat Draft Program Otomatis</h4>
@@ -331,7 +331,7 @@
         <!-- Analis Content (Awalnya Disembunyikan / Hidden) -->
         <div id="section-analis" class="flex-1 overflow-y-auto p-6 hidden">
             <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h3 class="font-bold text-gray-800 text-lg">AI Agent: Analis Data Persona</h3>
+                <h3 class="font-bold text-gray-800 text-lg">Agen 1 Analis: Data Persona</h3>
                 <button id="btn-run-analysis" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow font-medium transition flex items-center">
                     <i class="fas fa-magic mr-2"></i> Mulai Analisa Sekarang
                 </button>
@@ -545,9 +545,9 @@
             const headerTitle = document.getElementById('header-title');
             if (tabName === 'dashboard') headerTitle.innerText = "Overview";
             if (tabName === 'program') headerTitle.innerText = "Program";
-            if (tabName === 'generator') headerTitle.innerText = "AI Program Generator";
+            if (tabName === 'generator') headerTitle.innerText = "Agen 2 Program";
             if (tabName === 'donatur') headerTitle.innerText = "Data Donatur";
-            if (tabName === 'analis') headerTitle.innerText = "Laporan AI Analis Data";
+            if (tabName === 'analis') headerTitle.innerText = "Laporan Agen 1 Analis";
         }
 
         // Event Listener Tombol Mulai Analisa AI

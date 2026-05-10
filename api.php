@@ -4,6 +4,9 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 
+// Matikan auto-exception mysqli bawaan PHP 8 agar error tidak jadi blank screen
+mysqli_report(MYSQLI_REPORT_OFF);
+
 // =======================================================
 // 1. TOKEN RAHASIA (Ibarat gembok baru untuk API ini)
 // =======================================================
@@ -19,44 +22,53 @@ if (!isset($data['token']) || $data['token'] !== $TOKEN_RAHASIA) {
 // 2. KREDENSIAL DATABASE (Sekarang bebas pakai simbol rumit!)
 // =======================================================
 $host = "localhost"; // Biarkan localhost karena 1 server
-$user = "u829486010_ldu"; // Username Database Bos
-$pass = "PASSWORD_DATABASE_BOS"; // Ganti dengan Password Database Bos
-$dbname = "u829486010_ldu"; // Nama Database Bos
+$user = "u829486010_ldu"; 
 
-$conn = new mysqli($host, $user, $pass, $dbname);
-if ($conn->connect_error) {
-    die(json_encode(["status" => "error", "message" => "Koneksi Hostinger Gagal: " . $conn->connect_error]));
-}
+// !!! SANGAT PENTING: GANTI TULISAN DI BAWAH INI DENGAN PASSWORD DATABASE ASLI BOS !!!
+$pass = "PASSWORD_DATABASE_BOS"; 
 
-$sql = $data['sql'] ?? '';
-$params = $data['params'] ?? [];
+$dbname = "u829486010_ldu"; 
 
-if (empty($sql)) {
-    die(json_encode(["status" => "error", "message" => "Query kosong."]));
-}
-
-$stmt = $conn->prepare($sql);
-if ($stmt) {
-    if (!empty($params)) {
-        $types = str_repeat('s', count($params)); // Anggap semua parameter sebagai teks agar stabil
-        $stmt->bind_param($types, ...$params);
+try {
+    $conn = new mysqli($host, $user, $pass, $dbname);
+    if ($conn->connect_error) {
+        die(json_encode(["status" => "error", "message" => "Koneksi Hostinger Gagal: " . $conn->connect_error]));
     }
     
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
-        if ($result) {
-            $rows = [];
-            while ($row = $result->fetch_row()) { $rows[] = $row; }
-            echo json_encode(["status" => "success", "data" => $rows]);
-        } else {
-            echo json_encode(["status" => "success", "affected" => $stmt->affected_rows]);
-        }
-    } else {
-        echo json_encode(["status" => "error", "message" => "Gagal Eksekusi: " . $stmt->error]);
+    // Otomatis decode base64 dari Google untuk menembus Firewall Hostinger
+    $sql = isset($data['sql_base64']) ? base64_decode($data['sql_base64']) : ($data['sql'] ?? '');
+    $params = $data['params'] ?? [];
+    
+    if (empty($sql)) {
+        die(json_encode(["status" => "error", "message" => "Query kosong."]));
     }
-    $stmt->close();
-} else {
-    echo json_encode(["status" => "error", "message" => "SQL Prepare Gagal: " . $conn->error]);
+    
+    $stmt = $conn->prepare($sql);
+    if ($stmt) {
+        if (!empty($params)) {
+            $types = str_repeat('s', count($params)); // Anggap semua parameter sebagai teks agar stabil
+            $stmt->bind_param($types, ...$params);
+        }
+        
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            if ($result) {
+                $rows = [];
+                while ($row = $result->fetch_row()) { $rows[] = $row; }
+                echo json_encode(["status" => "success", "data" => $rows]);
+            } else {
+                echo json_encode(["status" => "success", "affected" => $stmt->affected_rows]);
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Gagal Eksekusi: " . $stmt->error]);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(["status" => "error", "message" => "SQL Prepare Gagal: " . $conn->error]);
+    }
+    $conn->close();
+} catch (Throwable $e) {
+    // Tangkap error fatal apapun dan kembalikan sebagai JSON
+    die(json_encode(["status" => "error", "message" => "Terjadi Error Fatal PHP: " . $e->getMessage()]));
 }
-$conn->close();
 ?>

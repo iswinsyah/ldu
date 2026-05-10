@@ -32,6 +32,9 @@
             <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-bullhorn w-5"></i> Program
             </a>
+            <a href="#" id="nav-generator" onclick="switchTab('generator')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
+                <i class="fas fa-magic w-5"></i> AI Program Generator
+            </a>
             <a href="#" id="nav-analis" onclick="switchTab('analis')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-brain w-5"></i> AI Analis Data
             </a>
@@ -195,6 +198,44 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Generator Content (Awalnya Disembunyikan / Hidden) -->
+        <div id="section-generator" class="flex-1 overflow-y-auto p-6 hidden">
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-800 text-lg mb-4">AI Program Generator</h3>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <h4 class="font-bold text-gray-700 mb-4"><i class="fas fa-robot text-blue-500 mr-2"></i>Buat Draft Program Otomatis</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Topik / Ide Program (Prompt)</label>
+                            <textarea id="gen-prompt" rows="3" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Buatkan program donasi untuk membantu warga terdampak banjir di Demak. Target dana 50 juta."></textarea>
+                        </div>
+                        <button id="btn-generate" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-md transition shadow-md">
+                            <i class="fas fa-magic mr-2"></i> Generate Draft dengan AI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hasil Generate (Disembunyikan sampai AI selesai) -->
+                <div id="gen-result" class="bg-white p-6 rounded-xl shadow-sm border border-blue-200 hidden">
+                    <h4 class="font-bold text-blue-800 mb-4">Hasil Generate AI (Review)</h4>
+                    <div class="space-y-4">
+                        <div><label class="block text-xs font-bold text-gray-500">Usulan Judul:</label><p id="res-judul" class="text-gray-800 font-medium p-2 bg-gray-50 rounded"></p></div>
+                        <div><label class="block text-xs font-bold text-gray-500">Usulan Target Dana:</label><p id="res-target" class="text-gray-800 font-medium p-2 bg-gray-50 rounded"></p></div>
+                        <div><label class="block text-xs font-bold text-gray-500">Usulan Gambar (Otomatis):</label><p id="res-gambar" class="text-gray-800 font-medium p-2 bg-gray-50 rounded text-sm break-all"></p></div>
+                        <div><label class="block text-xs font-bold text-gray-500">Artikel / Deskripsi:</label><div id="res-artikel" class="text-gray-800 p-3 bg-gray-50 rounded text-sm whitespace-pre-wrap"></div></div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button onclick="document.getElementById('gen-result').classList.add('hidden')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-md transition">Batal</button>
+                        <button id="btn-use-draft" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-md transition shadow-md">
+                            Gunakan Draft & Pindah ke Form <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
 

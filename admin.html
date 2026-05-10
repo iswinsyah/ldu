@@ -847,6 +847,14 @@
     document.getElementById('media-upload-input').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
+        
+        // Batasi ukuran maksimal 2MB untuk mencegah diblokir oleh server Hostinger
+        if (file.size > 2 * 1024 * 1024) {
+            alert("Ukuran gambar terlalu besar! Maksimal 2MB ya Bos.");
+            e.target.value = "";
+            return;
+        }
+        
         const reader = new FileReader();
         reader.onload = async function(event) {
             const btn = document.getElementById('btn-upload-media');
@@ -854,7 +862,13 @@
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengupload...';
             try {
                 const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'upload_media', filename: file.name, file_base64: event.target.result }) });
-                const result = await response.json();
+                const responseText = await response.text(); // Ambil respon mentah dulu
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    throw new Error("Respon server bukan JSON. Kemungkinan diblokir Hostinger. Detail: " + responseText.substring(0, 100));
+                }
                 if (result.status === 'success') { loadMedia(); } else { alert("Gagal upload: " + result.message); }
             } catch (error) { alert("Error upload: " + error.message); } 
             finally { btn.disabled = false; btn.innerHTML = originalText; e.target.value = ""; }

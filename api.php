@@ -46,20 +46,35 @@ try {
         $new_name = time() . '_' . rand(1000,9999) . '.' . $ext;
         
         $upload_dir = 'media/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true); // Otomatis buat folder jika belum ada
+        if (!is_dir($upload_dir)) {
+            if (!mkdir($upload_dir, 0755, true)) {
+                die(json_encode(["status" => "error", "message" => "Gagal membuat folder media/ di server."]));
+            }
+        }
         
         // Bersihkan teks "data:image/png;base64," di depan string
         if (strpos($base64_string, ',') !== false) {
             $base64_string = explode(',', $base64_string)[1];
         }
         
-        file_put_contents($upload_dir . $new_name, base64_decode($base64_string));
+        $decoded = base64_decode($base64_string);
+        if (file_put_contents($upload_dir . $new_name, $decoded) === false) {
+            die(json_encode(["status" => "error", "message" => "Gagal menyimpan file fisik ke folder media/."]));
+        }
+        
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
         $file_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . "/" . $upload_dir . $new_name;
         
         $stmt = $conn->prepare("INSERT INTO data_media (waktu, nama_file, url) VALUES (NOW(), ?, ?)");
+        if (!$stmt) {
+            die(json_encode(["status" => "error", "message" => "SQL Prepare Gagal: " . $conn->error]));
+        }
         $stmt->bind_param("ss", $original_name, $file_url);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            die(json_encode(["status" => "error", "message" => "SQL Insert Gagal: " . $stmt->error]));
+        }
+        $stmt->close();
+        
         die(json_encode(["status" => "success", "url" => $file_url]));
     }
 

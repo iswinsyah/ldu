@@ -484,6 +484,7 @@
             document.getElementById('section-program').classList.add('hidden');
             document.getElementById('section-donatur').classList.add('hidden');
             document.getElementById('section-analis').classList.add('hidden');
+            document.getElementById('section-generator').classList.add('hidden');
             
             // Reset style semua nav
             const navClasses = "flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer";
@@ -493,6 +494,7 @@
             document.getElementById('nav-program').className = navClasses;
             document.getElementById('nav-donatur').className = navClasses;
             document.getElementById('nav-analis').className = navClasses;
+            document.getElementById('nav-generator').className = navClasses;
             
             // Munculkan section yang dipilih dan beri warna aktif pada nav-nya
             document.getElementById('section-' + tabName).classList.remove('hidden');
@@ -502,6 +504,7 @@
             const headerTitle = document.getElementById('header-title');
             if (tabName === 'dashboard') headerTitle.innerText = "Overview";
             if (tabName === 'program') headerTitle.innerText = "Program";
+            if (tabName === 'generator') headerTitle.innerText = "AI Program Generator";
             if (tabName === 'donatur') headerTitle.innerText = "Data Donatur";
             if (tabName === 'analis') headerTitle.innerText = "Laporan AI Analis Data";
         }

@@ -407,6 +407,12 @@
 
     <!-- Script Fetch Data dari Database LDU via Web App Apps Script -->
     <script>
+        // ==========================================
+        // KONFIGURASI API HOSTINGER
+        // ==========================================
+        const HOSTINGER_API = "api.php"; // Path relatif (karena berada di folder yang sama)
+        const HOSTINGER_TOKEN = "LduBerkah999!"; // Token yang disetting di api.php
+
         let globalLeadsData = []; // Menyimpan data leads untuk diexport
         let globalProgramsData = []; // Menyimpan data program untuk fitur edit
 
@@ -803,8 +809,6 @@
     // ==========================================
     // FITUR PENYIMPANAN MEDIA (LANGSUNG KE HOSTINGER)
     // ==========================================
-    const HOSTINGER_API = "api.php"; // Path relatif (karena berada di folder yang sama)
-    const HOSTINGER_TOKEN = "LduBerkah999!"; // Token yang disetting di api.php
 
     async function loadMedia() {
         const grid = document.getElementById('media-grid');

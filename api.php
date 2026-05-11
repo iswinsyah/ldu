@@ -158,6 +158,8 @@ try {
         $l = []; $d = []; if($res) { while($r = $res->fetch_assoc()) { $l[] = $r['browser']; $d[] = $r['jml']; } } $stats['chart_browser'] = ['labels' => $l, 'data' => $d];
         $res = $conn->query("SELECT os, COUNT(*) as jml FROM data_trafik GROUP BY os");
         $l = []; $d = []; if($res) { while($r = $res->fetch_assoc()) { $l[] = $r['os']; $d[] = $r['jml']; } } $stats['chart_os'] = ['labels' => $l, 'data' => $d];
+        $res = $conn->query("SELECT perangkat, COUNT(*) as jml FROM data_trafik GROUP BY perangkat");
+        $l = []; $d = []; if($res) { while($r = $res->fetch_assoc()) { $l[] = $r['perangkat']; $d[] = $r['jml']; } } $stats['chart_perangkat'] = ['labels' => $l, 'data' => $d];
         $res = $conn->query("SELECT sumber, COUNT(*) as jml FROM data_trafik GROUP BY sumber ORDER BY jml DESC LIMIT 5");
         $l = []; $d = []; if($res) { while($r = $res->fetch_assoc()) { $l[] = $r['sumber']; $d[] = $r['jml']; } } $stats['chart_sumber'] = ['labels' => $l, 'data' => $d];
         

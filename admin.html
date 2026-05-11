@@ -110,18 +110,24 @@
                         <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Sistem Operasi (OS)</h4>
                         <div class="h-48"><canvas id="osChart"></canvas></div>
                     </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64">
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Perangkat</h4>
+                        <div class="h-48"><canvas id="deviceChart"></canvas></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h4 class="text-sm font-bold text-gray-600 mb-4 border-b pb-2">Top Keyword Pencarian</h4>
                         <ul id="list-keyword" class="space-y-2 text-sm text-gray-600">
                             <li>Memuat...</li>
                         </ul>
                     </div>
-                </div>
-                
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h4 class="text-sm font-bold text-gray-600 mb-4 border-b pb-2">Asal Pengunjung (Kota Teratas)</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="list-kota">
-                        <div>Memuat...</div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h4 class="text-sm font-bold text-gray-600 mb-4 border-b pb-2">Asal Pengunjung (Kota Teratas)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="list-kota">
+                            <div>Memuat...</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,7 +176,7 @@
         // ==========================================
         // FUNGSI LOAD DASHBOARD STATISTIK
         // ==========================================
-        let trafficChartInst = null; let sourceChartInst = null; let browserChartInst = null; let osChartInst = null;
+        let trafficChartInst = null; let sourceChartInst = null; let browserChartInst = null; let osChartInst = null; let deviceChartInst = null;
 
         async function loadDashboard() {
             try {
@@ -204,6 +210,9 @@
 
                     if (osChartInst) osChartInst.destroy();
                     osChartInst = new Chart(document.getElementById('osChart'), { type: 'doughnut', data: { labels: d.chart_os.labels, datasets: [{ data: d.chart_os.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
+
+                    if (deviceChartInst) deviceChartInst.destroy();
+                    deviceChartInst = new Chart(document.getElementById('deviceChart'), { type: 'doughnut', data: { labels: d.chart_perangkat.labels, datasets: [{ data: d.chart_perangkat.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
 
                     document.getElementById('list-keyword').innerHTML = d.keyword.length ? d.keyword.map(k => `<li class="flex justify-between border-b border-gray-50 pb-1"><span>${k.keyword}</span><span class="font-bold">${k.jml}</span></li>`).join('') : '<li class="text-gray-400 italic text-center">Belum ada data keyword</li>';
                     document.getElementById('list-kota').innerHTML = d.asal_kota.length ? d.asal_kota.map(k => `<div class="bg-gray-50 p-2 rounded flex justify-between border border-gray-100"><span class="font-medium">${k.kota || 'Unknown'}</span><span class="bg-green-100 text-green-700 px-2 rounded-full text-xs flex items-center">${k.jml} kunjungan</span></div>`).join('') : '<div class="text-gray-400 italic col-span-full text-center">Belum ada data lokasi</div>';

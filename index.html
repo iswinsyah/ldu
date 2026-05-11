@@ -38,7 +38,14 @@
                 if (navigator.userAgent.match(/Android/i)) os = "Android";
                 if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) os = "iOS";
 
-                let device = /Mobile|Android|iP(hone|od|ad)/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
+                // Deteksi Perangkat (Mobile, Tablet, PC)
+                let ua = navigator.userAgent;
+                let device = 'PC / Desktop';
+                if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+                    device = 'Tablet';
+                } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(ua)) {
+                    device = 'Mobile';
+                }
                 
                 // Tangkap Keyword dari URL (misal dari Iklan Ads atau Pencarian)
                 const urlParams = new URLSearchParams(window.location.search);

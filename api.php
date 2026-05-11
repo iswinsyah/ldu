@@ -400,7 +400,7 @@ try {
     // =======================================================
     if (isset($data['action']) && $data['action'] === 'call_ai') {
         // PASTE URL WEB APP GOOGLE APPS SCRIPT BOS DI SINI
-        $GAS_WEB_APP_URL = "MASUKKAN_URL_WEB_APP_GAS_DI_SINI";
+        $GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
 
         $prompt = $data['prompt'] ?? '';
         if (empty($prompt)) {

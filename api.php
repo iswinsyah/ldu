@@ -271,6 +271,20 @@ try {
     }
 
     // =======================================================
+    // 4.4c JALUR KHUSUS: HAPUS DATA DONASI PER BARIS
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'delete_donatur') {
+        $id = $data['id'] ?? '';
+        $stmt = $conn->prepare("DELETE FROM data_donatur WHERE id=?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            die(json_encode(["status" => "success", "message" => "Data donasi berhasil dihapus!"]));
+        } else {
+            die(json_encode(["status" => "error", "message" => "Gagal menghapus data: " . $stmt->error]));
+        }
+    }
+
+    // =======================================================
     // 4.5 JALUR KHUSUS: AI AGENT (GEMINI API VIA PHP)
     // =======================================================
     if (isset($data['action']) && $data['action'] === 'call_ai') {

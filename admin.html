@@ -229,12 +229,15 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h3 class="font-bold text-gray-800"><i class="fas fa-file-import mr-2 text-blue-500"></i>Import Data (CSV)</h3>
-                            <p class="text-xs text-gray-500 mt-1">Siapkan file CSV dengan 4 kolom berurutan: <strong class="text-gray-800">Nama | WhatsApp | Total Donasi | Frekuensi</strong></p>
+                            <p class="text-xs text-gray-500 mt-1">Siapkan file Excel lalu Save As ke CSV. Pastikan ada <strong class="text-gray-800">8 kolom berurutan dari Kiri ke Kanan:</strong><br><strong class="text-gray-800 text-[11px]">No | WhatsApp | Nama | L/P | Tgl Donasi (YYYY-MM-DD) | Jumlah Donasi | Frekuensi | Program</strong></p>
                         </div>
                         <div class="flex gap-2 w-full md:w-auto">
                             <input type="file" id="csv-upload-input" accept=".csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-md cursor-pointer">
                             <button id="btn-import-csv" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition shadow whitespace-nowrap">
-                                <i class="fas fa-upload mr-2"></i> Import 13.000 Data
+                                <i class="fas fa-upload mr-2"></i> Import Data
+                            </button>
+                            <button id="btn-kosongkan-donatur" class="bg-red-50 text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-md transition shadow-sm whitespace-nowrap border border-red-200" title="Reset/Hapus Semua Data">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     </div>
@@ -256,10 +259,11 @@
                                     <th class="px-4 py-3">Hari</th>
                                     <th class="px-6 py-3">Jumlah Donasi</th>
                                     <th class="px-6 py-3">Program</th>
+                                    <th class="px-6 py-3 text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="donatur-table-body">
-                                <tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">Memuat data donasi...</td></tr>
+                                <tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">Memuat data donasi...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -657,7 +661,7 @@
 
                 const tbody = document.getElementById('donatur-table-body');
                 if (result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">Belum ada data donasi. Silakan import dari CSV.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">Belum ada data donasi. Silakan import dari CSV.</td></tr>';
                 } else {
                     tbody.innerHTML = '';
                     result.data.forEach((d, index) => {
@@ -677,6 +681,9 @@
                                 <td class="px-4 py-4 text-gray-500 capitalize">${hari}</td>
                                 <td class="px-6 py-4 font-bold text-green-600">Rp ${Number(d.total_donasi).toLocaleString('id-ID')}</td>
                                 <td class="px-6 py-4 text-gray-600 truncate max-w-xs" title="${program}">${program}</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button onclick="deleteDonatur(${d.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                </td>
                             </tr>`;
                     });
                 }
@@ -712,6 +719,31 @@
         } catch (error) { alert("Error import: " + error.message); } 
         finally { btn.disabled = false; btn.innerHTML = originalText; }
     });
+
+    document.getElementById('btn-kosongkan-donatur').addEventListener('click', async function() {
+        if(confirm("AWAS BOS! Ini akan menghapus SELURUH data donasi (Termasuk yang 13.000 data) secara permanen. Lanjutkan?")) {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            try {
+                const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'clear_donatur' }) });
+                const result = await response.json();
+                if (result.status === 'success') { alert(result.message); loadDonatur(); }
+                else { alert("Gagal: " + result.message); }
+            } catch (error) { alert("Error: " + error.message); }
+            finally { btn.disabled = false; btn.innerHTML = originalText; }
+        }
+    });
+
+    async function deleteDonatur(id) {
+        if(confirm("Yakin ingin menghapus data donasi ini?")) {
+            try {
+                const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'delete_donatur', id: id }) });
+                const result = await response.json();
+                if (result.status === 'success') { loadDonatur(); } else { alert(result.message); }
+            } catch (err) { alert("Error: " + err.message); }
+        }
+    }
 
     // ==========================================
     // FUNGSI MANAJEMEN PROGRAM

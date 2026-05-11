@@ -399,22 +399,17 @@ try {
     // 4.5 JALUR KHUSUS: AI AGENT (GEMINI API VIA PHP)
     // =======================================================
     if (isset($data['action']) && $data['action'] === 'call_ai') {
-        // AMBIL API KEY DARI REQUEST BROWSER (LEBIH AMAN, TIDAK TEREKAM DI GITHUB)
-        $GEMINI_API_KEY = $data['api_key'] ?? ''; 
-        
-        if (empty($GEMINI_API_KEY)) {
-            die(json_encode(["status" => "error", "message" => "API Key Gemini tidak dikirim dari browser."]));
-        }
+        // PASTE URL WEB APP GOOGLE APPS SCRIPT BOS DI SINI
+        $GAS_WEB_APP_URL = "MASUKKAN_URL_WEB_APP_GAS_DI_SINI";
 
         $prompt = $data['prompt'] ?? '';
         if (empty($prompt)) {
             die(json_encode(["status" => "error", "message" => "Prompt kosong."]));
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $GEMINI_API_KEY;
-        $postData = json_encode([ "contents" => [ ["parts" => [["text" => $prompt]]] ] ]);
+        $postData = json_encode([ "prompt" => $prompt, "token" => $TOKEN_RAHASIA ]);
 
-        $ch = curl_init($url);
+        $ch = curl_init($GAS_WEB_APP_URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
@@ -425,16 +420,11 @@ try {
         curl_close($ch);
 
         if ($err) {
-            die(json_encode(["status" => "error", "message" => "Gagal menghubungi server Google API: " . $err]));
+            die(json_encode(["status" => "error", "message" => "Gagal menghubungi server GAS: " . $err]));
         }
 
-        $result = json_decode($response, true);
-        if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-            die(json_encode(["status" => "success", "data" => $result['candidates'][0]['content']['parts'][0]['text']]));
-        } else {
-            $errorMsg = $result['error']['message'] ?? "Format balasan tidak dikenali.";
-            die(json_encode(["status" => "error", "message" => "Gemini API Error: " . $errorMsg]));
-        }
+        // Response dari GAS sudah berformat JSON sukses/error siap pakai
+        die($response);
     }
 
     // =======================================================

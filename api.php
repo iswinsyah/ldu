@@ -245,9 +245,9 @@ try {
     // =======================================================
     if (isset($data['action']) && $data['action'] === 'call_ai') {
         // TULIS API KEY GEMINI BOS DI SINI (DAPATKAN DARI GOOGLE AI STUDIO)
-        $GEMINI_API_KEY = "MASUKKAN_API_KEY_GEMINI_BOS_DISINI"; 
+        $GEMINI_API_KEY = "AIzaSyCMSLHbNvcZlG5NdydU37bijTwwcDcyZnQ"; 
         
-        if ($GEMINI_API_KEY === "MASUKKAN_API_KEY_GEMINI_BOS_DISINI") {
+        if (empty($GEMINI_API_KEY) || $GEMINI_API_KEY === "MASUKKAN_API_KEY_GEMINI_BOS_DISINI") {
             die(json_encode(["status" => "error", "message" => "API Key Gemini belum diisi di dalam file api.php Bos!"]));
         }
 

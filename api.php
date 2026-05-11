@@ -256,7 +256,7 @@ try {
             die(json_encode(["status" => "error", "message" => "Prompt kosong."]));
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $GEMINI_API_KEY;
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $GEMINI_API_KEY;
         $postData = json_encode([ "contents" => [ ["parts" => [["text" => $prompt]]] ] ]);
 
         $ch = curl_init($url);

@@ -189,12 +189,24 @@ try {
         $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `gender` VARCHAR(10) DEFAULT '-' AFTER `whatsapp`");
         $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `program` VARCHAR(255) DEFAULT '-' AFTER `gender`");
 
-        // Batasi tampilan 100 terakhir agar browser tidak berat, tapi ringkasan (summary) baca semua
-        $res = $conn->query("SELECT * FROM data_donatur ORDER BY id DESC LIMIT 100");
+        // Pagination & Pencarian
+        $page = isset($data['page']) ? max(1, intval($data['page'])) : 1;
+        $limit = 100;
+        $offset = ($page - 1) * $limit;
+        
+        $search = isset($data['search']) ? $conn->real_escape_string($data['search']) : '';
+        $where = "";
+        if (!empty($search)) {
+            $where = "WHERE nama LIKE '%$search%' OR whatsapp LIKE '%$search%' OR program LIKE '%$search%'";
+        }
+
+        $res = $conn->query("SELECT * FROM data_donatur $where ORDER BY waktu DESC, id DESC LIMIT $limit OFFSET $offset");
         $donaturs = [];
         if ($res) { while($r = $res->fetch_assoc()) { $donaturs[] = $r; } }
         
         $summary = [];
+        $summary['total_filtered'] = $conn->query("SELECT COUNT(*) FROM data_donatur $where")->fetch_row()[0] ?? 0;
+        $summary['total_pages'] = ceil($summary['total_filtered'] / $limit);
         $summary['total'] = $conn->query("SELECT COUNT(*) FROM data_donatur")->fetch_row()[0] ?? 0;
         $summary['kecil_jarang'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Kecil Jarang'")->fetch_row()[0] ?? 0;
         $summary['kecil_rutin'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Kecil Rutin'")->fetch_row()[0] ?? 0;

@@ -29,6 +29,9 @@
             <a href="#" id="nav-ai1" onclick="switchTab('ai1')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-brain w-5"></i> AI 1 Analis Data
             </a>
+            <a href="#" id="nav-ai2" onclick="switchTab('ai2')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
+                <i class="fas fa-magic w-5"></i> AI 2 Generator Program
+            </a>
             <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-bullhorn w-5"></i> Program
             </a>
@@ -160,6 +163,36 @@
                         <button onclick="document.getElementById('ai1-result-container').classList.add('hidden')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition">Tutup / Batal</button>
                         <button id="btn-ai1-accept" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center">
                             <i class="fas fa-check-circle mr-2"></i> Terima & Simpan Persona
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI 2 Generator Program -->
+            <div id="section-ai2" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Agen AI 2: Generator Program Donasi</h2>
+                
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex items-start">
+                    <i class="fas fa-magic text-xl mr-3 mt-0.5"></i> 
+                    <p>Agen AI ini bertugas membuatkan <strong>Judul, Target Dana, dan Artikel Copywriting</strong> untuk program penggalangan dana Anda secara otomatis.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Ide Program / Instruksi (Prompt):</label>
+                    <textarea id="ai2-prompt" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 mb-4" placeholder="Contoh: Buatkan program donasi untuk membangun sumur bor di desa pelosok. Target donatur ibu-ibu usia 30-40 tahun."></textarea>
+                    
+                    <button id="btn-ai2-generate" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md flex items-center">
+                        <i class="fas fa-robot mr-2"></i> Generate Program Sekarang
+                    </button>
+                </div>
+
+                <div id="ai2-result-container" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-bullhorn text-blue-600 mr-2"></i> Hasil Generator Program</h3>
+                    <div id="ai2-result-content" class="text-gray-700 text-sm leading-relaxed space-y-4 mb-6 whitespace-pre-wrap"></div>
+                    <div class="mt-4 flex justify-end gap-3 border-t border-gray-100 pt-4">
+                        <button onclick="document.getElementById('ai2-result-container').classList.add('hidden')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition">Tutup / Batal</button>
+                        <button id="btn-ai2-use" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center">
+                            <i class="fas fa-arrow-right mr-2"></i> Gunakan & Pindah ke Form Program
                         </button>
                     </div>
                 </div>
@@ -465,6 +498,7 @@
         // Sembunyikan semua section
         document.getElementById('section-dashboard').classList.add('hidden');
         document.getElementById('section-ai1').classList.add('hidden');
+        document.getElementById('section-ai2').classList.add('hidden');
         document.getElementById('section-donatur').classList.add('hidden');
         document.getElementById('section-program').classList.add('hidden');
         document.getElementById('section-media').classList.add('hidden');
@@ -475,6 +509,7 @@
         
         document.getElementById('nav-dashboard').className = navClasses;
         document.getElementById('nav-ai1').className = navClasses;
+        document.getElementById('nav-ai2').className = navClasses;
         document.getElementById('nav-donatur').className = navClasses;
         document.getElementById('nav-program').className = navClasses;
         document.getElementById('nav-media').className = navClasses;
@@ -488,6 +523,7 @@
         if (tabName === 'dashboard') { headerTitle.innerText = "Dashboard Statistik"; loadDashboard(); }
         if (tabName === 'donatur') { headerTitle.innerText = "Data Donatur"; loadDonatur(); }
         if (tabName === 'ai1') headerTitle.innerText = "AI 1 Analis Data";
+        if (tabName === 'ai2') headerTitle.innerText = "AI 2 Generator Program";
         if (tabName === 'program') { headerTitle.innerText = "Program Donasi"; loadProgram(); }
         if (tabName === 'media') { headerTitle.innerText = "Media & Gambar"; loadMedia(); }
     }
@@ -549,6 +585,56 @@
     // FUNGSI TOMBOL ACCEPT AI 1
     document.getElementById('btn-ai1-accept').addEventListener('click', function() {
         alert("Alhamdulillah, Persona Donatur berhasil diterima dan disimpan!\n\nNantinya data ini akan kita oper ke 'Agen AI 2 Generator' untuk merangkai detail Program Donasi otomatis.");
+    });
+
+    // ==========================================
+    // FUNGSI AGEN AI 2: GENERATOR PROGRAM
+    // ==========================================
+    document.getElementById('btn-ai2-generate').addEventListener('click', async function() {
+        const promptInput = document.getElementById('ai2-prompt').value.trim();
+        if (!promptInput) return alert("Mohon isi ide program atau instruksi terlebih dahulu, Bos!");
+
+        const btn = this;
+        const originalBtnHTML = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI Sedang Menulis...';
+        
+        const resultContainer = document.getElementById('ai2-result-container');
+        const resultContent = document.getElementById('ai2-result-content');
+        resultContainer.classList.remove('hidden');
+        resultContent.innerHTML = '<p class="text-gray-500 italic"><i class="fas fa-pen-fancy fa-spin mr-2"></i> Merangkai kata-kata emosional dan persuasif... (Tunggu sebentar)</p>';
+
+        try {
+            const cleanPrompt = promptInput.replace(/[\r\n\t"'\\]/g, " ").trim();
+            const fullPrompt = `Anda adalah ahli Copywriting Fundraising profesional. Buatkan materi kampanye penggalangan dana dari ide berikut: ${cleanPrompt}. Susun jawaban PERSIS dengan format ini (tanpa markdown tebal/miring dan tambahan apa pun): \nJUDUL: [Tulis Judul clickbait]\nTARGET DANA: [Tulis angka saja, misal 50000000]\nARTIKEL:\n[Tulis artikel copywriting minimal 3 paragraf]`;
+
+            const aiResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'call_ai', prompt: fullPrompt }) });
+            const aiResult = await aiResponse.json();
+            
+            if (aiResult.status === "success") {
+                resultContent.innerHTML = aiResult.data.replace(/\n/g, '<br>');
+                resultContent.setAttribute('data-raw', aiResult.data);
+            } else { resultContent.innerHTML = `<span class="text-red-500 font-bold">Gagal: ${aiResult.message}</span>`; }
+        } catch (error) { resultContent.innerHTML = `<span class="text-red-500 font-bold">Error: ${error.message}</span>`; } 
+        finally { btn.disabled = false; btn.innerHTML = originalBtnHTML; }
+    });
+
+    document.getElementById('btn-ai2-use').addEventListener('click', function() {
+        const rawText = document.getElementById('ai2-result-content').getAttribute('data-raw');
+        if (!rawText) return;
+        
+        let judul = "", target = "", artikel = "";
+        const jMatch = rawText.match(/JUDUL:\s*(.*)/i);
+        const tMatch = rawText.match(/TARGET DANA:\s*(\d+)/i);
+        const aMatch = rawText.match(/ARTIKEL:\s*([\s\S]*)/i);
+        
+        if (jMatch) judul = jMatch[1].replace(/\*\*/g, '').trim();
+        if (tMatch) target = tMatch[1].trim();
+        if (aMatch) artikel = aMatch[1].replace(/\*\*/g, '').trim();
+        else artikel = rawText; // fallback jika regex lolos
+        
+        document.getElementById('prog-judul').value = judul; document.getElementById('prog-target').value = target; document.getElementById('prog-artikel').value = artikel;
+        alert("Materi berhasil disalin ke Form Program!\nSilakan lengkapi URL Gambar lalu klik 'Simpan Program'.");
+        switchTab('program');
     });
 
     // ==========================================

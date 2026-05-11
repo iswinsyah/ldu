@@ -44,12 +44,12 @@ try {
         $file = $_FILES['file'];
         $original_name = $file['name'];
         $ext = pathinfo($original_name, PATHINFO_EXTENSION);
-        $new_name = time() . '_' . rand(1000,9999) . '.' . $ext;
+        $new_name = uniqid('media_') . '.' . $ext;
         
-        $upload_dir = 'asset/';
+        $upload_dir = 'uploads/';
         if (!is_dir($upload_dir)) {
-            if (!mkdir($upload_dir, 0755, true)) {
-                die(json_encode(["status" => "error", "message" => "Gagal membuat folder asset/."]));
+            if (!mkdir($upload_dir, 0777, true)) {
+                die(json_encode(["status" => "error", "message" => "Gagal membuat folder uploads/."]));
             }
         }
         

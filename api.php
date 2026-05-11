@@ -46,10 +46,10 @@ try {
         $ext = pathinfo($original_name, PATHINFO_EXTENSION);
         $new_name = time() . '_' . rand(1000,9999) . '.' . $ext;
         
-        $upload_dir = 'media/';
+        $upload_dir = 'asset/';
         if (!is_dir($upload_dir)) {
             if (!mkdir($upload_dir, 0755, true)) {
-                die(json_encode(["status" => "error", "message" => "Gagal membuat folder media/."]));
+                die(json_encode(["status" => "error", "message" => "Gagal membuat folder asset/."]));
             }
         }
         

@@ -402,15 +402,16 @@
                 const d = statResult.data;
                 const total = d.kunjungan.total;
                 if(total > 0) {
-                    // Bersihkan tanda kutip dari nama kota jaga-jaga jika ada
-                    const kotaTop = d.asal_kota.length > 0 ? d.asal_kota[0].kota.replace(/["']/g, "") : '-';
-                    statText = `Total Kunjungan Web: ${total} kunjungan. Kota domisili terbanyak: ${kotaTop}.`;
+                    const kotaTop = d.asal_kota.length > 0 ? d.asal_kota[0].kota : '-';
+                    statText = `Total Kunjungan: ${total}. Kota terbanyak: ${kotaTop}.`;
                 }
             }
 
-            // 2. Susun Prompt Super Cerdas untuk AI (TANPA TANDA KUTIP SAMA SEKALI AGAR JSON GOOGLE SCRIPT TIDAK CRASH)
-            const cleanProgram = programType.replace(/["'\\]/g, ""); // Hilangkan kutipan dari inputan Bos
-            const promptTopic = `Tolong riset dan rumuskan Buyer Persona (Target Donatur Potensial) yang sangat detail untuk program penggalangan dana: ${cleanProgram}. Sebagai informasi tambahan, statistik audiens web LDU saat ini adalah: ${statText}. Jika data web minim/kosong, abaikan data tersebut dan silakan gunakan kemampuan riset mandiri Anda menggunakan data empiris dari internet tentang perilaku donatur program sejenis. Buatkan struktur hasil: 1. Demografi, 2. Psikografi, 3. Perilaku Digital, 4. Saran Angle Copywriting Iklan.`;
+            // 2. SAPU BERSIH SEMUA KARAKTER BERBAHAYA (Enter, Tab, Kutip, dll) AGAR AMAN DARI GOOGLE APPS SCRIPT
+            const cleanProgram = programType.replace(/[\r\n\t"'\\]/g, " ").trim();
+            const cleanStat = statText.replace(/[\r\n\t"'\\]/g, " ").trim();
+            
+            const promptTopic = `Tolong riset Buyer Persona detail untuk program donasi: ${cleanProgram}. Info data web LDU: ${cleanStat}. Buatkan struktur: 1.Demografi 2.Psikografi 3.Perilaku Digital 4.Angle Iklan.`;
 
             // 3. Panggil Agen AI via Google Apps Script Endpoint
             const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";

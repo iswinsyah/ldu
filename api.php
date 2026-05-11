@@ -171,6 +171,75 @@ try {
         die(json_encode(["status" => "success", "data" => $stats]));
     }
 
+    // =======================================================
+    // 4.3 JALUR KHUSUS: GET DATA DONATUR
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'get_donatur') {
+        $conn->query("CREATE TABLE IF NOT EXISTS `data_donatur` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `waktu` DATETIME,
+            `nama` VARCHAR(150),
+            `whatsapp` VARCHAR(50),
+            `total_donasi` DECIMAL(15,2) DEFAULT 0,
+            `frekuensi_donasi` INT DEFAULT 1,
+            `kategori` VARCHAR(50)
+        )");
+
+        // Batasi tampilan 100 terakhir agar browser tidak berat, tapi ringkasan (summary) baca semua
+        $res = $conn->query("SELECT * FROM data_donatur ORDER BY id DESC LIMIT 100");
+        $donaturs = [];
+        if ($res) { while($r = $res->fetch_assoc()) { $donaturs[] = $r; } }
+        
+        $summary = [];
+        $summary['total'] = $conn->query("SELECT COUNT(*) FROM data_donatur")->fetch_row()[0] ?? 0;
+        $summary['kecil_jarang'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Kecil Jarang'")->fetch_row()[0] ?? 0;
+        $summary['kecil_rutin'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Kecil Rutin'")->fetch_row()[0] ?? 0;
+        $summary['besar_jarang'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Besar Jarang'")->fetch_row()[0] ?? 0;
+        $summary['besar_rutin'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Besar Rutin'")->fetch_row()[0] ?? 0;
+
+        die(json_encode(["status" => "success", "data" => $donaturs, "summary" => $summary]));
+    }
+
+    // =======================================================
+    // 4.4 JALUR KHUSUS: IMPORT CSV DONATUR
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'import_donatur') {
+        if (!isset($_FILES['file_csv'])) {
+            die(json_encode(["status" => "error", "message" => "Tidak ada file CSV yang diterima."]));
+        }
+        
+        $file = $_FILES['file_csv']['tmp_name'];
+        $handle = fopen($file, "r");
+        if ($handle !== FALSE) {
+            fgetcsv($handle, 1000, ","); // Lewati baris pertama (Header Judul Kolom)
+            $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, total_donasi, frekuensi_donasi, kategori) VALUES (NOW(), ?, ?, ?, ?, ?)");
+            $count = 0;
+            
+            $conn->autocommit(FALSE); // Optimasi kecepatan tinggi untuk 13.000 data
+            
+            while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                $nama = $row[0] ?? 'Hamba Allah';
+                $whatsapp = $row[1] ?? '';
+                $total_donasi = isset($row[2]) ? floatval(preg_replace('/[^0-9.]/', '', $row[2])) : 0;
+                $frekuensi = isset($row[3]) ? intval($row[3]) : 1;
+                
+                // AI Pelabelan RFM Otomatis
+                $kategori = "Kecil Jarang";
+                if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "Besar Rutin"; }
+                else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
+                else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "Kecil Rutin"; }
+                
+                $stmt->bind_param("ssdis", $nama, $whatsapp, $total_donasi, $frekuensi, $kategori);
+                $stmt->execute();
+                $count++;
+            }
+            $conn->commit();
+            fclose($handle);
+            $stmt->close();
+            die(json_encode(["status" => "success", "message" => "Alhamdulillah! $count data donatur berhasil diimport & dikategorikan!"]));
+        }
+    }
+
     // 5. JALUR KHUSUS: EKSEKUSI SQL DARI GOOGLE APPS SCRIPT
     $sql = isset($data['sql_base64']) ? base64_decode($data['sql_base64']) : ($data['sql'] ?? '');
     $params = $data['params'] ?? [];

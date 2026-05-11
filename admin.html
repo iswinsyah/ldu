@@ -23,6 +23,9 @@
             <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-chart-pie w-5"></i> Dashboard
             </a>
+            <a href="#" id="nav-donatur" onclick="switchTab('donatur')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
+                <i class="fas fa-users w-5"></i> Data Donatur
+            </a>
             <a href="#" id="nav-ai1" onclick="switchTab('ai1')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-brain w-5"></i> AI 1 Analis Data
             </a>
@@ -158,6 +161,71 @@
                         <button id="btn-ai1-accept" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center">
                             <i class="fas fa-check-circle mr-2"></i> Terima & Simpan Persona
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Donatur -->
+            <div id="section-donatur" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Data Donatur (RFM Analysis)</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Total Donatur</p>
+                        <h3 id="rfm-total" class="text-2xl font-bold text-gray-800">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Kecil Jarang</p>
+                        <h3 id="rfm-kj" class="text-xl font-bold text-red-500">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Kecil Rutin</p>
+                        <h3 id="rfm-kr" class="text-xl font-bold text-yellow-500">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Besar Jarang</p>
+                        <h3 id="rfm-bj" class="text-xl font-bold text-blue-500">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center border-b-4 border-green-500">
+                        <p class="text-xs text-green-600 font-bold mb-1">Besar Rutin (VIP)</p>
+                        <h3 id="rfm-br" class="text-xl font-bold text-green-600">...</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-200">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h3 class="font-bold text-gray-800"><i class="fas fa-file-import mr-2 text-blue-500"></i>Import Data (CSV)</h3>
+                            <p class="text-xs text-gray-500 mt-1">Siapkan file CSV dengan 4 kolom berurutan: <strong class="text-gray-800">Nama | WhatsApp | Total Donasi | Frekuensi</strong></p>
+                        </div>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <input type="file" id="csv-upload-input" accept=".csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-md cursor-pointer">
+                            <button id="btn-import-csv" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition shadow whitespace-nowrap">
+                                <i class="fas fa-upload mr-2"></i> Import 13.000 Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Daftar Donatur (100 Terbaru)</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                    <th class="px-6 py-3">Nama</th>
+                                    <th class="px-6 py-3">WhatsApp</th>
+                                    <th class="px-6 py-3">Total Donasi</th>
+                                    <th class="px-6 py-3">Frekuensi</th>
+                                    <th class="px-6 py-3">Kategori RFM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="donatur-table-body">
+                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Memuat data donatur...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -345,6 +413,7 @@
         // Sembunyikan semua section
         document.getElementById('section-dashboard').classList.add('hidden');
         document.getElementById('section-ai1').classList.add('hidden');
+        document.getElementById('section-donatur').classList.add('hidden');
         document.getElementById('section-program').classList.add('hidden');
         document.getElementById('section-media').classList.add('hidden');
         
@@ -354,6 +423,7 @@
         
         document.getElementById('nav-dashboard').className = navClasses;
         document.getElementById('nav-ai1').className = navClasses;
+        document.getElementById('nav-donatur').className = navClasses;
         document.getElementById('nav-program').className = navClasses;
         document.getElementById('nav-media').className = navClasses;
         
@@ -364,6 +434,7 @@
         // Ubah Judul Header
         const headerTitle = document.getElementById('header-title');
         if (tabName === 'dashboard') { headerTitle.innerText = "Dashboard Statistik"; loadDashboard(); }
+        if (tabName === 'donatur') { headerTitle.innerText = "Data Donatur"; loadDonatur(); }
         if (tabName === 'ai1') headerTitle.innerText = "AI 1 Analis Data";
         if (tabName === 'program') headerTitle.innerText = "Program";
         if (tabName === 'media') { headerTitle.innerText = "Media & Gambar"; loadMedia(); }
@@ -427,6 +498,76 @@
     // FUNGSI TOMBOL ACCEPT AI 1
     document.getElementById('btn-ai1-accept').addEventListener('click', function() {
         alert("Alhamdulillah, Persona Donatur berhasil diterima dan disimpan!\n\nNantinya data ini akan kita oper ke 'Agen AI 2 Generator' untuk merangkai detail Program Donasi otomatis.");
+    });
+
+    // ==========================================
+    // FUNGSI DATA DONATUR (LOAD & IMPORT)
+    // ==========================================
+    async function loadDonatur() {
+        try {
+            const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'get_donatur' }) });
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                document.getElementById('rfm-total').innerText = result.summary.total;
+                document.getElementById('rfm-kj').innerText = result.summary.kecil_jarang;
+                document.getElementById('rfm-kr').innerText = result.summary.kecil_rutin;
+                document.getElementById('rfm-bj').innerText = result.summary.besar_jarang;
+                document.getElementById('rfm-br').innerText = result.summary.besar_rutin;
+
+                const tbody = document.getElementById('donatur-table-body');
+                if (result.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data donatur. Silakan import dari CSV.</td></tr>';
+                } else {
+                    tbody.innerHTML = '';
+                    result.data.forEach(d => {
+                        let badgeClass = 'bg-gray-100 text-gray-700';
+                        if (d.kategori === 'Besar Rutin') badgeClass = 'bg-green-100 text-green-700 border border-green-200 font-bold';
+                        else if (d.kategori === 'Besar Jarang') badgeClass = 'bg-blue-100 text-blue-700';
+                        else if (d.kategori === 'Kecil Rutin') badgeClass = 'bg-yellow-100 text-yellow-700';
+                        else if (d.kategori === 'Kecil Jarang') badgeClass = 'bg-red-100 text-red-700';
+                        
+                        tbody.innerHTML += `
+                            <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-gray-800">${d.nama}</td>
+                                <td class="px-6 py-4">${d.whatsapp}</td>
+                                <td class="px-6 py-4">Rp ${Number(d.total_donasi).toLocaleString('id-ID')}</td>
+                                <td class="px-6 py-4">${d.frekuensi_donasi}x</td>
+                                <td class="px-6 py-4"><span class="${badgeClass} px-2 py-1 rounded text-xs">${d.kategori}</span></td>
+                            </tr>`;
+                    });
+                }
+            }
+        } catch (err) { console.error("Gagal load donatur", err); }
+    }
+
+    document.getElementById('btn-import-csv').addEventListener('click', async function() {
+        const fileInput = document.getElementById('csv-upload-input');
+        const file = fileInput.files[0];
+        
+        if (!file) return alert("Pilih file CSV dulu ya, Bos!");
+        
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.disabled = true; 
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sedang Memproses 13.000 Data...';
+        
+        const formData = new FormData();
+        formData.append('token', HOSTINGER_TOKEN);
+        formData.append('action', 'import_donatur');
+        formData.append('file_csv', file);
+        
+        try {
+            const response = await fetch(HOSTINGER_API, { method: 'POST', body: formData });
+            const result = await response.json();
+            
+            if (result.status === 'success') { 
+                alert(result.message);
+                fileInput.value = "";
+                loadDonatur();
+            } else { alert("Gagal import: " + result.message); }
+        } catch (error) { alert("Error import: " + error.message); } 
+        finally { btn.disabled = false; btn.innerHTML = originalText; }
     });
 
     // Panggil dashboard saat halaman pertama kali dibuka

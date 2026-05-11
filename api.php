@@ -282,6 +282,52 @@ try {
         }
     }
 
+    // =======================================================
+    // 4.6 JALUR KHUSUS: MANAJEMEN PROGRAM DONASI
+    // =======================================================
+    if (isset($data['action']) && in_array($data['action'], ['get_program', 'save_program', 'delete_program'])) {
+        $conn->query("CREATE TABLE IF NOT EXISTS `data_program` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `waktu` DATETIME,
+            `judul` VARCHAR(255),
+            `target_dana` DECIMAL(15,2) DEFAULT 0,
+            `terkumpul` DECIMAL(15,2) DEFAULT 0,
+            `url_gambar` VARCHAR(255),
+            `artikel` TEXT,
+            `status` VARCHAR(50) DEFAULT 'Aktif'
+        )");
+
+        if ($data['action'] === 'get_program') {
+            $res = $conn->query("SELECT * FROM data_program ORDER BY id DESC");
+            $programs = [];
+            if ($res) { while($r = $res->fetch_assoc()) { $programs[] = $r; } }
+            die(json_encode(["status" => "success", "data" => $programs]));
+        }
+
+        if ($data['action'] === 'save_program') {
+            $id = $data['id'] ?? ''; $judul = $data['judul'] ?? ''; $target = $data['target_dana'] ?? 0;
+            $gambar = $data['url_gambar'] ?? ''; $artikel = $data['artikel'] ?? '';
+
+            if (empty($id)) {
+                $stmt = $conn->prepare("INSERT INTO data_program (waktu, judul, target_dana, url_gambar, artikel, status) VALUES (NOW(), ?, ?, ?, ?, 'Aktif')");
+                $stmt->bind_param("sdss", $judul, $target, $gambar, $artikel);
+            } else {
+                $stmt = $conn->prepare("UPDATE data_program SET judul=?, target_dana=?, url_gambar=?, artikel=? WHERE id=?");
+                $stmt->bind_param("sdssi", $judul, $target, $gambar, $artikel, $id);
+            }
+            if ($stmt->execute()) { die(json_encode(["status" => "success", "message" => "Program berhasil disimpan!"])); } 
+            else { die(json_encode(["status" => "error", "message" => "Gagal menyimpan program: " . $stmt->error])); }
+        }
+
+        if ($data['action'] === 'delete_program') {
+            $id = $data['id'] ?? '';
+            $stmt = $conn->prepare("DELETE FROM data_program WHERE id=?");
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) { die(json_encode(["status" => "success", "message" => "Program berhasil dihapus!"])); } 
+            else { die(json_encode(["status" => "error", "message" => "Gagal menghapus program: " . $stmt->error])); }
+        }
+    }
+
     // 5. JALUR KHUSUS: EKSEKUSI SQL DARI GOOGLE APPS SCRIPT
     $sql = isset($data['sql_base64']) ? base64_decode($data['sql_base64']) : ($data['sql'] ?? '');
     $params = $data['params'] ?? [];

@@ -3,861 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Lumbung Dana Umat</title>
+    <title>Admin Minimalis LDU</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Tambahkan library Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
+<body class="bg-gray-100 font-sans text-gray-800 p-4 md:p-8">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-green-900 text-white flex flex-col hidden md:flex">
-        <div class="h-16 flex items-center px-6 border-b border-green-800">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-leaf text-xl text-yellow-400"></i>
-                <span class="font-bold text-xl tracking-wide">LDU Admin</span>
-            </div>
-        </div>
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium cursor-pointer">
-                <i class="fas fa-chart-pie w-5"></i> Dashboard
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
-                <i class="fas fa-users w-5"></i> Data Leads Ebook
-            </a>
-            <a href="#" id="nav-donatur" onclick="switchTab('donatur')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-hand-holding-heart w-5"></i> Data Donatur
-            </a>
-            <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-bullhorn w-5"></i> Program
-            </a>
-            <a href="#" id="nav-media" onclick="switchTab('media')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-images w-5"></i> Media / Gambar
-            </a>
-            <a href="#" id="nav-generator" onclick="switchTab('generator')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-magic w-5"></i> Agen 2 Program
-            </a>
-            <a href="#" id="nav-analis" onclick="switchTab('analis')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-brain w-5"></i> Agen 1 Analis
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition">
-                <i class="fas fa-cog w-5"></i> Pengaturan
-            </a>
-        </nav>
-        <div class="p-4 border-t border-green-800">
-            <a href="index.html" class="flex items-center gap-3 px-4 py-2 text-green-300 hover:text-white transition">
-                <i class="fas fa-sign-out-alt w-5"></i> Keluar
-            </a>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-hidden">
-        <!-- Header -->
-        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
-            <div class="flex items-center gap-4">
-                <button class="md:hidden text-gray-500 hover:text-green-600 focus:outline-none">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <h2 id="header-title" class="text-xl font-bold text-gray-800">Overview</h2>
-            </div>
-            <div class="flex items-center gap-4">
-                <button class="text-gray-400 hover:text-green-600 relative">
-                    <i class="far fa-bell text-xl"></i>
-                    <span class="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">3</span>
-                </button>
-                <div class="flex items-center gap-2 border-l pl-4 border-gray-200">
-                    <img src="https://ui-avatars.com/api/?name=Admin+Bos&background=0D8ABC&color=fff" alt="Admin" class="w-8 h-8 rounded-full">
-                    <span class="font-medium text-sm hidden sm:block">Admin Bos</span>
-                </div>
-            </div>
+    <div class="max-w-4xl mx-auto">
+        <!-- Header Sederhana -->
+        <header class="bg-white p-6 rounded-xl shadow-sm mb-6 flex justify-between items-center border border-gray-200">
+            <h1 class="text-2xl font-bold text-green-700"><i class="fas fa-leaf mr-2"></i> LDU Admin (Mulai Baru)</h1>
+            <a href="index.html" class="text-sm text-gray-500 hover:text-green-600"><i class="fas fa-home mr-1"></i> Ke Depan</a>
         </header>
 
-        <!-- Dashboard Content -->
-        <div id="section-dashboard" class="flex-1 overflow-y-auto p-6">
-            
-            <!-- TOFU: Ringkasan Kunjungan -->
-            <div class="mb-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-4">Ringkasan Kunjungan (Data TOFU)</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Harian</p>
-                        <h3 id="stat-harian" class="text-2xl font-bold text-gray-800">...</h3>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Pekanan</p>
-                        <h3 id="stat-pekanan" class="text-2xl font-bold text-gray-800">...</h3>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Bulanan</p>
-                        <h3 id="stat-bulanan" class="text-2xl font-bold text-gray-800">...</h3>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Tahunan</p>
-                        <h3 id="stat-tahunan" class="text-2xl font-bold text-gray-800">...</h3>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Total Kunjungan</p>
-                        <h3 id="stat-total" class="text-2xl font-bold text-green-600">...</h3>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Total IP Unik</p>
-                        <h3 id="stat-ip-unik" class="text-2xl font-bold text-blue-600">...</h3>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TOFU: Analitik Trafik & Teknologi -->
-            <div class="mb-8">
-                <h3 class="font-bold text-gray-800 mb-4 text-lg">Analitik Trafik & Teknologi</h3>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-72">
-                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Tren Kunjungan (7 Hari Terakhir)</h4>
-                        <div class="h-56"><canvas id="trafficChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-72">
-                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Sumber Trafik (Referrer)</h4>
-                        <div class="h-56"><canvas id="sourceChart"></canvas></div>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-64">
-                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Browser</h4>
-                        <div class="h-48"><canvas id="browserChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-64">
-                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Sistem Operasi (OS)</h4>
-                        <div class="h-48"><canvas id="osChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative h-64">
-                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Perangkat</h4>
-                        <div class="h-48"><canvas id="deviceChart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Tables Area -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Recent Leads Table -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
-                    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-800">Leads Ebook Terbaru (MOFU)</h3>
-                        <div class="flex gap-3">
-                            <button id="btn-export-csv" class="text-sm bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded flex items-center gap-2 transition shadow-sm font-medium"><i class="fas fa-file-csv"></i> Export CSV</button>
-                            <button class="text-sm text-gray-500 hover:text-green-800 font-medium px-2 py-1.5">Lihat Semua</button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase">
-                                    <th class="px-6 py-3">Nama</th>
-                                    <th class="px-6 py-3">WhatsApp</th>
-                                    <th class="px-6 py-3">Persona AI</th>
-                                    <th class="px-6 py-3">Tanggal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leads-table-body" class="text-sm">
-                                <tr>
-                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">Menyinkronkan data dengan database...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <!-- Top Locations Table -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h4 class="font-bold text-gray-700 mb-3">Top Lokasi Pengunjung</h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead>
-                                    <tr class="text-gray-500 border-b"><th class="pb-2">Kota, Negara</th><th class="pb-2 text-right">Jumlah Kunjungan</th></tr>
-                                </thead>
-                                <tbody id="location-table-body">
-                                    <tr><td colspan="2" class="py-2 text-center text-gray-400">Menyinkronkan data lokasi...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Actions / AI Agent Info -->
-                    <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-xl shadow-sm text-white p-6">
-                        <h3 class="font-bold text-lg mb-2">Status AI Agent</h3>
-                        <p class="text-green-100 text-sm mb-4">Sistem Orkestrasi AI berjalan normal.</p>
-                        
-                        <div class="space-y-3">
-                            <div class="bg-green-900 bg-opacity-40 p-3 rounded-lg flex items-center gap-3">
-                                <i class="fas fa-robot text-yellow-400 text-xl"></i> 
-                                <div><p class="font-medium text-sm">AI Agent 1 (CS)</p><p class="text-xs text-green-200">Aktif (Fonnte)</p></div>
-                            </div>
-                            <div class="bg-green-900 bg-opacity-40 p-3 rounded-lg flex items-center gap-3">
-                                <i class="fas fa-brain text-blue-400 text-xl"></i> 
-                                <div><p class="font-medium text-sm">AI Agent 2 (Analis)</p><p class="text-xs text-green-200">Aktif (Gemini)</p></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Media Content (Awalnya Disembunyikan / Hidden) -->
-        <div id="section-media" class="flex-1 overflow-y-auto p-6 hidden">
-            <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h3 class="font-bold text-gray-800 text-lg">Penyimpanan Media (Server Hostinger)</h3>
-                <div>
-                    <input type="file" id="media-upload-input" class="hidden" accept="image/*">
-                    <button id="btn-upload-media" onclick="document.getElementById('media-upload-input').click()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg shadow font-medium transition flex items-center">
-                        <i class="fas fa-upload mr-2"></i> Upload Gambar Baru
-                    </button>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    <div class="col-span-full text-center text-gray-500 py-8">Memuat gambar...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Generator Content (Awalnya Disembunyikan / Hidden) -->
-        <div id="section-generator" class="flex-1 overflow-y-auto p-6 hidden">
-            <div class="mb-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-4">Agen 2 Program</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <!-- Trigger 1: Auto -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 relative">
-                        <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-bl-lg">Trigger 1</div>
-                        <h4 class="font-bold text-gray-700 mb-2"><i class="fas fa-magic text-blue-500 mr-2"></i>Usulan AI Otomatis</h4>
-                        <p class="text-sm text-gray-600 mb-4">AI akan membaca <strong>Persona Donatur (BOFU)</strong> terbaru dan merumuskan program yang paling relevan untuk mereka.</p>
-                        <button id="btn-gen-auto" class="w-full bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white font-bold py-2.5 px-4 rounded-md transition border border-blue-200">
-                            Buat Usulan dari Data BOFU
-                        </button>
-                    </div>
-
-                    <!-- Trigger 2: Manual -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative">
-                        <div class="absolute top-0 right-0 bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-bl-lg">Trigger 2</div>
-                        <h4 class="font-bold text-gray-700 mb-2"><i class="fas fa-keyboard text-gray-500 mr-2"></i>Instruksi Manual</h4>
-                        <p class="text-sm text-gray-600 mb-2">Punya ide sendiri? Perintahkan AI untuk menyusun 9 poin strateginya secara komprehensif.</p>
-                        <textarea id="gen-prompt" rows="2" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm mb-3" placeholder="Contoh: Buat program santunan yatim 100 juta..."></textarea>
-                        <button id="btn-gen-manual" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 px-4 rounded-md transition shadow-md">
-                            Susun Strategi dari Instruksi
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Hasil Generate (Disembunyikan sampai AI selesai) -->
-                <div id="gen-result" class="bg-white p-6 rounded-xl shadow-sm border border-blue-200 hidden">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                        <h4 class="font-bold text-blue-800 text-lg">Laporan Hasil Pekerjaan Agen 2</h4>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Kolom Kiri: Strategi Internal (Untuk Manajemen) -->
-                        <div>
-                            <h5 class="font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded mb-3"><i class="fas fa-lock text-gray-500 mr-2"></i>Strategi & Analisis Internal (9 Poin)</h5>
-                            <div id="res-strategi" class="text-gray-700 text-sm leading-relaxed p-4 bg-gray-50 rounded-lg border border-gray-200 whitespace-pre-wrap"></div>
-                        </div>
-
-                        <!-- Kolom Kanan: Untuk Publik / Landing Page -->
-                        <div>
-                            <h5 class="font-bold text-gray-700 bg-green-100 px-3 py-1 rounded mb-3"><i class="fas fa-globe text-green-600 mr-2"></i>Materi Publikasi (Landing Page)</h5>
-                            <div class="space-y-4">
-                                <div><label class="block text-xs font-bold text-gray-500">Usulan Judul Program:</label><p id="res-judul" class="text-gray-800 font-medium p-2 bg-gray-50 rounded border border-gray-200"></p></div>
-                                <div><label class="block text-xs font-bold text-gray-500">Usulan Target Dana:</label><p id="res-target" class="text-gray-800 font-medium p-2 bg-gray-50 rounded border border-gray-200"></p></div>
-                                <div class="hidden"><label class="block text-xs font-bold text-gray-500">Referensi Gambar:</label><p id="res-gambar" class="text-gray-800 font-medium p-2 bg-gray-50 rounded text-sm break-all border border-gray-200"></p></div>
-                                <div><label class="block text-xs font-bold text-gray-500">Copywriting / Artikel Web:</label><div id="res-artikel" class="text-gray-800 p-3 bg-gray-50 rounded text-sm whitespace-pre-wrap border border-gray-200 h-64 overflow-y-auto"></div></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex justify-end gap-3">
-                        <button onclick="document.getElementById('gen-result').classList.add('hidden')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-md transition">Tolak / Batal</button>
-                        <button id="btn-use-draft" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-md transition shadow-md">
-                            <i class="fas fa-check-circle mr-2"></i> Accept & Pindah ke Form
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Program Content (Awalnya Disembunyikan / Hidden) -->
-        <div id="section-program" class="flex-1 overflow-y-auto p-6 hidden">
-            <div class="mb-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-4">Manajemen Program</h3>
-                
-                <!-- Form Tambah Program -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-                    <h4 class="font-bold text-gray-700 mb-4"><i class="fas fa-plus-circle text-green-600 mr-2"></i>Tambah Program Baru</h4>
-                    <form id="form-program" class="space-y-5">
-                        <input type="hidden" id="prog-id" value="">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Judul Program</label>
-                            <input type="text" id="prog-judul" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Contoh: Wakaf Sumur Bor untuk Desa X">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Target Dana (Rp)</label>
-                                <input type="number" id="prog-target" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Contoh: 50000000">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">URL Gambar Banner</label>
-                                <input type="url" id="prog-gambar" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="https://contoh.com/gambar.jpg">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Artikel / Deskripsi Program</label>
-                            <textarea id="prog-artikel" rows="5" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Ceritakan detail program donasi ini..."></textarea>
-                        </div>
-                        <div class="text-right">
-                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-md transition shadow-md">
-                                Terbitkan Program <i class="fas fa-paper-plane ml-2"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Tabel Daftar Program -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                    <div class="px-6 py-5 border-b border-gray-100">
-                        <h4 class="font-bold text-gray-800">Daftar Program Aktif</h4>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-gray-50 text-gray-500 uppercase text-xs">
-                                    <th class="px-6 py-3">Program</th>
-                                    <th class="px-6 py-3">Target (Rp)</th>
-                                    <th class="px-6 py-3">Terkumpul</th>
-                                    <th class="px-6 py-3 text-right">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="program-table-body">
-                                <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada program yang diinput.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Donatur Content (Awalnya Disembunyikan / Hidden) -->
-        <div id="section-donatur" class="flex-1 overflow-y-auto p-6 hidden">
-            <div class="mb-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-4">Data Donatur</h3>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                    <div class="px-6 py-5 border-b border-gray-100">
-                        <h4 class="font-bold text-gray-800">Daftar Transaksi Donasi</h4>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-gray-50 text-gray-500 uppercase text-xs">
-                                    <th class="px-6 py-3">Waktu</th>
-                                    <th class="px-6 py-3">Nama Donatur</th>
-                                    <th class="px-6 py-3">Program</th>
-                                    <th class="px-6 py-3">Nominal (Rp)</th>
-                                    <th class="px-6 py-3">Metode</th>
-                                    <th class="px-6 py-3">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="donatur-table-body">
-                                <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada donatur yang tercatat.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Analis Content (Awalnya Disembunyikan / Hidden) -->
-        <div id="section-analis" class="flex-1 overflow-y-auto p-6 hidden">
-            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h3 class="font-bold text-gray-800 text-lg">Agen 1 Analis: Data Persona</h3>
-                <button id="btn-run-analysis" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow font-medium transition flex items-center">
-                    <i class="fas fa-magic mr-2"></i> Mulai Analisa Sekarang
+        <!-- Kotak Upload -->
+        <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-200">
+            <h2 class="text-lg font-bold mb-4 border-b pb-2"><i class="fas fa-upload text-blue-500 mr-2"></i> Tes Upload Gambar</h2>
+            <div class="flex flex-col sm:flex-row gap-4 items-center">
+                <input type="file" id="media-upload-input" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-md cursor-pointer">
+                <button id="btn-upload-media" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-md transition shadow whitespace-nowrap">
+                    <i class="fas fa-cloud-upload-alt mr-2"></i> Upload File
                 </button>
             </div>
-            
-            <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex items-center">
-                <i class="fas fa-info-circle text-xl mr-3"></i> AI Agent ini secara otomatis bekerja setiap tanggal 1 awal bulan untuk menganalisa seluruh data pengunjung (TOFU), leads (MOFU), dan donatur (BOFU).
-            </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h4 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-users text-gray-400 mr-2"></i> TOFU Persona (Trafik)</h4>
-                    <p id="analis-tofu" class="text-sm text-gray-600 italic leading-relaxed">Belum ada data analisa. Silakan klik "Mulai Analisa Sekarang".</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h4 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-book-reader text-yellow-500 mr-2"></i> MOFU Persona (Leads)</h4>
-                    <p id="analis-mofu" class="text-sm text-gray-600 italic leading-relaxed">Belum ada data analisa.</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h4 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-hand-holding-heart text-green-500 mr-2"></i> BOFU Persona (Donatur)</h4>
-                    <p id="analis-bofu" class="text-sm text-gray-600 italic leading-relaxed">Belum ada data analisa.</p>
-                </div>
+        <!-- Galeri Gambar -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-bold mb-4 border-b pb-2"><i class="fas fa-images text-green-500 mr-2"></i> Galeri (Folder uploads/)</h2>
+            <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div class="col-span-full text-center text-gray-500 py-8">Memuat gambar...</div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- Script Fetch Data dari Database LDU via Web App Apps Script -->
     <script>
         // ==========================================
         // KONFIGURASI API HOSTINGER
         // ==========================================
-        const HOSTINGER_API = "api.php"; // Path relatif (karena berada di folder yang sama)
-        const HOSTINGER_TOKEN = "LduBerkah999!"; // Token yang disetting di api.php
+        const HOSTINGER_API = "api.php"; 
+        const HOSTINGER_TOKEN = "LduBerkah999!"; 
 
-        let globalLeadsData = []; // Menyimpan data leads untuk diexport
-        let globalProgramsData = []; // Menyimpan data program untuk fitur edit
-
-        document.addEventListener("DOMContentLoaded", async function() {
-            const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+        // FUNGSI MEMUAT GAMBAR
+        async function loadMedia() {
+            const grid = document.getElementById('media-grid');
+            grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data dari database...</div>';
             
             try {
-                const response = await fetch(endpoint);
-                const result = await response.json();
-                
-                if (result.status === "success") {
-                    // 1. Update Kartu Statistik Kunjungan Atas
-                    document.getElementById('stat-harian').innerText = result.data.kunjungan.harian || 0;
-                    document.getElementById('stat-pekanan').innerText = result.data.kunjungan.pekanan || 0;
-                    document.getElementById('stat-bulanan').innerText = result.data.kunjungan.bulanan || 0;
-                    document.getElementById('stat-tahunan').innerText = result.data.kunjungan.tahunan || 0;
-                    document.getElementById('stat-total').innerText = result.data.kunjungan.total || 0;
-                    document.getElementById('stat-ip-unik').innerText = result.data.kunjungan.ipUnik || 0;
-
-                    // 2. Render Tabel Leads Terbaru (MOFU)
-                    globalLeadsData = result.data.leads || [];
-                    const tbody = document.getElementById('leads-table-body');
-                    tbody.innerHTML = ""; 
-                    
-                    if (result.data.leads.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada leads yang masuk.</td></tr>';
-                    } else {
-                        result.data.leads.forEach(lead => {
-                            const waktu = new Date(lead.waktu.replace(" ", "T")).toLocaleString('id-ID', {
-                                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                            });
-                            const tr = document.createElement('tr');
-                            tr.className = "border-b border-gray-50 hover:bg-gray-50";
-                            tr.innerHTML = `
-                                <td class="px-6 py-4 font-medium text-gray-800">${lead.nama}</td>
-                                <td class="px-6 py-4">${lead.whatsapp}</td>
-                                <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">${lead.persona}</span></td>
-                                <td class="px-6 py-4 text-gray-500">${waktu}</td>
-                            `;
-                            tbody.appendChild(tr);
-                        });
-                    }
-
-                    // 3. Render Grafik (TOFU)
-                    const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } };
-                    const colors = ['#10B981', '#3B82F6', '#F59E0B', '#F43F5E', '#8B5CF6', '#6366F1'];
-
-                    new Chart(document.getElementById('trafficChart'), { type: 'line', data: {
-                        labels: result.data.chartTraffic.labels,
-                        datasets: [{ label: 'Kunjungan Harian', data: result.data.chartTraffic.data, borderColor: '#059669', backgroundColor: 'rgba(5, 150, 105, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }]
-                    }, options: { responsive: true, maintainAspectRatio: false }});
-
-                    new Chart(document.getElementById('sourceChart'), { type: 'bar', data: {
-                        labels: result.data.chartSource.labels,
-                        datasets: [{ label: 'Sumber Trafik', data: result.data.chartSource.data, backgroundColor: colors }]
-                    }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }});
-
-                    new Chart(document.getElementById('browserChart'), { type: 'doughnut', data: { labels: result.data.chartBrowser.labels, datasets: [{ data: result.data.chartBrowser.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
-                    new Chart(document.getElementById('osChart'), { type: 'doughnut', data: { labels: result.data.chartOs.labels, datasets: [{ data: result.data.chartOs.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
-                    new Chart(document.getElementById('deviceChart'), { type: 'doughnut', data: { labels: result.data.chartDevice.labels, datasets: [{ data: result.data.chartDevice.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
-
-                    // 4. Render Table Lokasi
-                    const locBody = document.getElementById('location-table-body');
-                    locBody.innerHTML = "";
-                    if(result.data.topLocations.length === 0) {
-                        locBody.innerHTML = '<tr><td colspan="2" class="py-2 text-center text-gray-400">Belum ada data lokasi</td></tr>';
-                    } else {
-                        result.data.topLocations.forEach(loc => {
-                            locBody.innerHTML += `<tr class="border-b border-gray-50"><td class="py-2 text-gray-700">${loc.nama}</td><td class="py-2 text-right font-semibold">${loc.jml}</td></tr>`;
-                        });
-                    }
-                    
-                    // 5. Render Tabel Program di Tab Campaign
-                    globalProgramsData = result.data.programs || [];
-                    const progBody = document.getElementById('program-table-body');
-                    progBody.innerHTML = "";
-                    if(!result.data.programs || result.data.programs.length === 0) {
-                        progBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada program yang diinput.</td></tr>';
-                    } else {
-                        result.data.programs.forEach(p => {
-                            const terkumpul = 0; // Sementara 0 sebelum fitur payment gateway
-                            progBody.innerHTML += `
-                                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-800">${p.judul}</td>
-                                    <td class="px-6 py-4">Rp ${Number(p.target_dana).toLocaleString('id-ID')}</td>
-                                    <td class="px-6 py-4">Rp ${terkumpul.toLocaleString('id-ID')}</td>
-                                    <td class="px-6 py-4 text-right">
-                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold mr-2">${p.status}</span>
-                                        <button onclick="editProgram(${p.id})" class="text-blue-500 hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button>
-                                        <button onclick="hapusProgram(${p.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>`;
-                        });
-                    }
-                    
-                    // 6. Render Tabel Donatur
-                    const donaturBody = document.getElementById('donatur-table-body');
-                    donaturBody.innerHTML = "";
-                    if(!result.data.donaturs || result.data.donaturs.length === 0) {
-                        donaturBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada donatur yang tercatat.</td></tr>';
-                    } else {
-                        result.data.donaturs.forEach(d => {
-                            const waktu = new Date(d.waktu.replace(" ", "T")).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                            const statusClass = d.status === 'Berhasil' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
-                            donaturBody.innerHTML += `
-                                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                                    <td class="px-6 py-4 text-gray-500 whitespace-nowrap">${waktu}</td>
-                                    <td class="px-6 py-4 font-medium text-gray-800">${d.nama}<br><span class="text-xs text-gray-500">${d.whatsapp}</span></td>
-                                    <td class="px-6 py-4 text-gray-600">${d.program_judul}</td>
-                                    <td class="px-6 py-4 font-bold text-green-600 whitespace-nowrap">Rp ${Number(d.nominal).toLocaleString('id-ID')}</td>
-                                    <td class="px-6 py-4">${d.metode_pembayaran}</td>
-                                    <td class="px-6 py-4">
-                                        <span class="${statusClass} px-2 py-1 rounded text-xs font-semibold">${d.status}</span>
-                                    </td>
-                                </tr>`;
-                        });
-                    }
-                    
-                    // 7. Render Data Analisa AI Terakhir
-                    if(result.data.latestAnalysis && result.data.latestAnalysis.tofu) {
-                        document.getElementById('analis-tofu').innerHTML = result.data.latestAnalysis.tofu.replace(/\n/g, '<br><br>');
-                        document.getElementById('analis-mofu').innerHTML = result.data.latestAnalysis.mofu.replace(/\n/g, '<br><br>');
-                        document.getElementById('analis-bofu').innerHTML = result.data.latestAnalysis.bofu.replace(/\n/g, '<br><br>');
-                    }
-                } else {
-                    console.error("Kesalahan Database:", result.message);
-                    document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500 font-bold">Koneksi Database Gagal: ${result.message}</td></tr>`;
-                }
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Gagal terhubung ke Web App Endpoint.</td></tr>`;
-            }
-        });
-
-        // Event Listener untuk Tombol Export CSV
-        document.getElementById('btn-export-csv').addEventListener('click', function() {
-            if (!globalLeadsData || globalLeadsData.length === 0) {
-                alert("Belum ada data leads untuk diekspor.");
-                return;
-            }
-            
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Nama,WhatsApp,Persona AI,Waktu\n"; // Header CSV
-            
-            globalLeadsData.forEach(function(row) {
-                let rowData = `"${row.nama}","${row.whatsapp}","${row.persona}","${row.waktu}"`;
-                csvContent += rowData + "\r\n";
-            });
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Data_Leads_Ebook_LDU.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-
-        // Event Listener untuk UI Switch Tab (Navigasi Sidebar)
-        function switchTab(tabName) {
-            // Sembunyikan semua section
-            document.getElementById('section-dashboard').classList.add('hidden');
-            document.getElementById('section-program').classList.add('hidden');
-            document.getElementById('section-media').classList.add('hidden');
-            document.getElementById('section-donatur').classList.add('hidden');
-            document.getElementById('section-analis').classList.add('hidden');
-            document.getElementById('section-generator').classList.add('hidden');
-            
-            // Reset style semua nav
-            const navClasses = "flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer";
-            const activeClasses = "flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium cursor-pointer";
-            
-            document.getElementById('nav-dashboard').className = navClasses;
-            document.getElementById('nav-program').className = navClasses;
-            document.getElementById('nav-media').className = navClasses;
-            document.getElementById('nav-donatur').className = navClasses;
-            document.getElementById('nav-analis').className = navClasses;
-            document.getElementById('nav-generator').className = navClasses;
-            
-            // Munculkan section yang dipilih dan beri warna aktif pada nav-nya
-            document.getElementById('section-' + tabName).classList.remove('hidden');
-            document.getElementById('nav-' + tabName).className = activeClasses;
-
-            // Ubah Judul Header
-            const headerTitle = document.getElementById('header-title');
-            if (tabName === 'dashboard') headerTitle.innerText = "Overview";
-            if (tabName === 'program') headerTitle.innerText = "Program";
-            if (tabName === 'media') {
-                headerTitle.innerText = "Media & Gambar";
-                loadMedia(); // Otomatis load gambar dari Hostinger saat tab diklik
-            }
-            if (tabName === 'generator') headerTitle.innerText = "Agen 2 Program";
-            if (tabName === 'donatur') headerTitle.innerText = "Data Donatur";
-            if (tabName === 'analis') headerTitle.innerText = "Laporan Agen 1 Analis";
-        }
-
-        // Event Listener Tombol Mulai Analisa AI
-        document.getElementById('btn-run-analysis').addEventListener('click', async function() {
-            const originalText = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI Sedang Menganalisa...';
-            
-            try {
-                const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
-                const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ type: 'run_analysis' }) });
-                const result = await response.json();
-                
-                if(result.status === "success") {
-                    document.getElementById('analis-tofu').innerHTML = result.data.tofu.replace(/\n/g, '<br><br>');
-                    document.getElementById('analis-mofu').innerHTML = result.data.mofu.replace(/\n/g, '<br><br>');
-                    document.getElementById('analis-bofu').innerHTML = result.data.bofu.replace(/\n/g, '<br><br>');
-                    alert("Alhamdulillah! Analisa AI Agent selesai.");
-                } else {
-                    alert("Gagal melakukan analisa: " + result.message);
-                }
-            } catch (error) {
-                alert("Terjadi kesalahan saat memanggil AI: " + error.message);
-            } finally {
-                this.disabled = false;
-                this.innerHTML = originalText;
-            }
-        });
-
-        // Event Listener Tombol Riset Pasar Eksternal (Agen 1)
-        document.getElementById('btn-run-research').addEventListener('click', async function() {
-            const topic = document.getElementById('research-topic').value;
-            if(!topic) return alert("Silakan masukkan topik riset terlebih dahulu, Bos!");
-
-            const originalText = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sedang Riset...';
-            
-            const resContainer = document.getElementById('research-result');
-            resContainer.classList.remove('hidden');
-            resContainer.innerHTML = '<span class="text-gray-500 italic"><i class="fas fa-brain text-blue-400 mr-2"></i> Agen 1 sedang membaca literatur dan mensintesis data... mohon tunggu sekitar 5-10 detik.</span>';
-
-            try {
-                const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
-                const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ type: 'run_research', topic: topic }) });
-                const result = await response.json();
-                
-                if(result.status === "success") {
-                    resContainer.innerHTML = result.data.replace(/\n/g, '<br>');
-                } else {
-                    resContainer.innerHTML = "<span class='text-red-500 font-bold'>Gagal riset: " + result.message + "</span>";
-                }
-            } catch (error) {
-                resContainer.innerHTML = "<span class='text-red-500 font-bold'>Terjadi kesalahan koneksi.</span>";
-            } finally {
-                this.disabled = false;
-                this.innerHTML = originalText;
-            }
-        });
-
-        // Event Listener Form Program (Mengirim data ke Database via GAS)
-        document.getElementById('form-program').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const btnSubmit = this.querySelector('button[type="submit"]');
-            const originalText = btnSubmit.innerHTML;
-            btnSubmit.disabled = true;
-            btnSubmit.innerHTML = 'Menyimpan... <i class="fas fa-spinner fa-spin ml-2"></i>';
-
-            const progId = document.getElementById('prog-id').value;
-            const payload = {
-                type: progId ? 'edit_program' : 'tambah_program',
-                id: progId,
-                judul: document.getElementById('prog-judul').value,
-                target_dana: document.getElementById('prog-target').value,
-                url_gambar: document.getElementById('prog-gambar').value,
-                artikel: document.getElementById('prog-artikel').value
-            };
-
-            try {
-                const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
-                const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
-                
-                let result;
-                const responseText = await response.text(); // Ambil teks mentah dari Google
-                try {
-                    result = JSON.parse(responseText); // Coba ubah ke JSON
-                } catch (e) {
-                    throw new Error("Respon server bukan JSON. Kemungkinan URL Web App kadaluarsa atau lupa Deploy Versi Baru.\n\nDetail: " + responseText.substring(0, 100));
-                }
-
-                if (result.status === "success") {
-                    alert("Alhamdulillah! Program berhasil disimpan.");
-                    window.location.reload(); // Refresh untuk update tabel
-                } else {
-                    alert("Gagal menyimpan program: " + (result.message || "Unknown error"));
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Error: " + error.message);
-            } finally {
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = originalText;
-            }
-        });
-
-        // Fungsi untuk memasukkan data ke form Edit
-        function editProgram(id) {
-            const prog = globalProgramsData.find(p => p.id === id);
-            if (prog) {
-                document.getElementById('prog-id').value = prog.id;
-                document.getElementById('prog-judul').value = prog.judul;
-                document.getElementById('prog-target').value = prog.target_dana;
-                document.getElementById('prog-gambar').value = prog.url_gambar;
-                document.getElementById('prog-artikel').value = prog.artikel;
-                
-                const btnSubmit = document.querySelector('#form-program button[type="submit"]');
-                btnSubmit.innerHTML = 'Update Program <i class="fas fa-save ml-2"></i>';
-                
-                window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll ke atas form
-            }
-        }
-
-        // Fungsi untuk Hapus Program
-        async function hapusProgram(id) {
-            if (confirm("Apakah Bos yakin ingin menghapus program ini?")) {
-                try {
-                    const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
-                    const response = await fetch(endpoint, { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify({ type: 'hapus_program', id: id }) });
-                    const result = await response.json();
-                    if (result.status === "success") {
-                        alert("Program berhasil dihapus.");
-                        window.location.reload();
-                    } else {
-                        alert("Gagal menghapus: " + result.message);
-                    }
-                } catch (e) {
-                    alert("Error saat menghapus program.");
-                }
-            }
-        }
-
-    // Logika Agen 2 Program (Dua Trigger)
-    async function requestAIGeneration(triggerType, btnElement) {
-        const originalText = btnElement.innerHTML;
-        
-        let payload = { type: 'generate_program', trigger: triggerType };
-        
-        if (triggerType === 'manual') {
-            const prompt = document.getElementById('gen-prompt').value;
-            if(!prompt) return alert("Silakan masukkan instruksi/ide program dulu, Bos!");
-            payload.prompt = prompt;
-        } else {
-            const bofuText = document.getElementById('analis-bofu').innerText;
-            if(!bofuText || bofuText.includes("Belum ada data")) return alert("Data BOFU belum tersedia. Silakan masuk ke tab Agen 1 Analis dan jalankan analisa terlebih dahulu.");
-            payload.bofu = bofuText;
-        }
-
-        btnElement.disabled = true;
-        btnElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Agen 2 Sedang Bekerja...';
-        
-        try {
-            const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
-            const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
-            const result = await response.json();
-            
-            if(result.status === "success") {
-                document.getElementById('res-judul').innerText = result.data.judul;
-                document.getElementById('res-target').innerText = result.data.target;
-                document.getElementById('res-gambar').innerText = result.data.gambar || 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb0?w=800&q=80';
-                document.getElementById('res-artikel').innerHTML = (result.data.artikel_publik || '').replace(/\n/g, '<br>');
-                document.getElementById('res-strategi').innerHTML = (result.data.strategi_internal || '').replace(/\n/g, '<br>');
-                
-                document.getElementById('gen-result').classList.remove('hidden');
-            } else {
-                alert("Agen 2 Gagal: " + result.message);
-            }
-        } catch (error) {
-            alert("Terjadi kesalahan koneksi saat memanggil Agen 2: " + error.message);
-        } finally {
-            btnElement.disabled = false;
-            btnElement.innerHTML = originalText;
-        }
-    }
-
-    document.getElementById('btn-gen-auto').addEventListener('click', function() { requestAIGeneration('auto', this); });
-    document.getElementById('btn-gen-manual').addEventListener('click', function() { requestAIGeneration('manual', this); });
-
-    document.getElementById('btn-use-draft').addEventListener('click', function() {
-        // OTOMATIS: Pindahkan data dari AI langsung ke Form Program (Tanpa Copy Paste)
-        document.getElementById('prog-judul').value = document.getElementById('res-judul').innerText;
-        document.getElementById('prog-target').value = document.getElementById('res-target').innerText;
-        document.getElementById('prog-gambar').value = document.getElementById('res-gambar').innerText;
-        document.getElementById('prog-artikel').value = document.getElementById('res-artikel').innerText;
-        
-        // Pindah otomatis ke Menu Program agar siap di-Klik Terbitkan
-        switchTab('program');
-    });
-
-    // ==========================================
-    // FITUR PENYIMPANAN MEDIA (LANGSUNG KE HOSTINGER)
-    // ==========================================
-
-    async function loadMedia() {
-        const grid = document.getElementById('media-grid');
-        grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data gambar dari server...</div>';
-        
-        try {
             const response = await fetch(HOSTINGER_API, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                // Encode SQL dengan Base64 (Aman dari Firewall Hostinger)
                 body: JSON.stringify({ token: HOSTINGER_TOKEN, sql_base64: btoa("SELECT id, url, nama_file, waktu FROM data_media ORDER BY waktu DESC") })
             });
             const result = await response.json();
             if (result.status === 'success') {
-                grid.innerHTML = result.data.length === 0 ? '<div class="col-span-full text-center text-gray-500 py-8">Belum ada gambar yang diupload.</div>' : '';
-                result.data.forEach(row => {
-                    grid.innerHTML += `
-                        <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition group relative bg-gray-50 flex flex-col">
-                            <div class="h-32 bg-gray-200 flex items-center justify-center overflow-hidden relative">
-                                <img src="${row[1]}" alt="${row[2]}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="p-2 mt-auto">
-                                <p class="text-[10px] text-gray-500 truncate mb-2" title="${row[2]}">${row[2]}</p>
-                                <button onclick="copyToClipboard('${row[1]}')" class="w-full bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-medium py-1.5 rounded transition">
-                                    <i class="far fa-copy mr-1"></i> Copy URL
-                                </button>
-                            </div>
-                        </div>`;
-                });
-            } else { grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-8">Gagal memuat: ${result.message}</div>`; }
-        } catch (error) { grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-8">Error: ${error.message}</div>`; }
+                if (result.data.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">Belum ada gambar yang diupload.</div>';
+                } else {
+                    grid.innerHTML = '';
+                    result.data.forEach(row => {
+                        grid.innerHTML += `
+                            <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-gray-50 flex flex-col">
+                                <div class="h-32 bg-gray-200 flex items-center justify-center overflow-hidden">
+                                    <img src="${row[1]}" alt="${row[2]}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="p-2 mt-auto">
+                                    <p class="text-xs text-gray-500 truncate mb-2" title="${row[2]}">${row[2]}</p>
+                                    <button onclick="navigator.clipboard.writeText('${row[1]}'); alert('Link Tersalin!')" class="w-full bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs py-1.5 rounded transition font-medium">
+                                        <i class="far fa-copy mr-1"></i> Copy URL
+                                    </button>
+                                </div>
+                            </div>`;
+                    });
+                }
+            } else {
+                grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-8">Gagal memuat: ${result.message}</div>`;
+            }
+        } catch (error) {
+            grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-8">Error Koneksi: ${error.message}</div>`;
+        }
     }
 
-    function copyToClipboard(text) { navigator.clipboard.writeText(text); alert("URL Gambar Tersalin! Tinggal Paste di Form Program.\n\n" + text); }
-
-    document.getElementById('media-upload-input').addEventListener('change', async function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    // FUNGSI UPLOAD GAMBAR
+    document.getElementById('btn-upload-media').addEventListener('click', async function() {
+        const fileInput = document.getElementById('media-upload-input');
+        const file = fileInput.files[0];
         
-        // Batasi ukuran maksimal 2MB untuk mencegah diblokir oleh server Hostinger
-        if (file.size > 2 * 1024 * 1024) {
-            alert("Ukuran gambar terlalu besar! Maksimal 2MB ya Bos.");
-            e.target.value = "";
+        if (!file) {
+            alert("Pilih file gambar dulu ya, Bos!");
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            alert("Ukuran gambar terlalu besar! Maksimal 10MB.");
             return;
         }
         
-        const btn = document.getElementById('btn-upload-media');
+        const btn = this;
         const originalText = btn.innerHTML;
-        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengupload...';
+        btn.disabled = true; 
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Proses Upload...';
         
         const formData = new FormData();
         formData.append('token', HOSTINGER_TOKEN);
@@ -866,17 +110,31 @@
         
         try {
             const response = await fetch(HOSTINGER_API, { method: 'POST', body: formData });
-            const responseText = await response.text(); // Ambil respon mentah dulu
+            const responseText = await response.text();
             let result;
             try {
                 result = JSON.parse(responseText);
             } catch (parseError) {
-                throw new Error("Respon server bukan JSON. Kemungkinan diblokir Hostinger. Detail: " + responseText.substring(0, 100));
+                throw new Error("Respon server bukan JSON. Detail: " + responseText.substring(0, 100));
             }
-            if (result.status === 'success') { loadMedia(); } else { alert("Gagal upload: " + result.message); }
-        } catch (error) { alert("Error upload: " + error.message); } 
-        finally { btn.disabled = false; btn.innerHTML = originalText; e.target.value = ""; }
+            
+            if (result.status === 'success') { 
+                alert("Alhamdulillah! Gambar berhasil diupload.");
+                fileInput.value = ""; // Reset input
+                loadMedia(); // Muat ulang galeri
+            } else { 
+                alert("Gagal upload: " + result.message); 
+            }
+        } catch (error) { 
+            alert("Error upload: " + error.message); 
+        } finally { 
+            btn.disabled = false; 
+            btn.innerHTML = originalText; 
+        }
     });
+
+    // Panggil galeri saat halaman pertama kali dibuka
+    loadMedia();
     </script>
 </body>
 </html>

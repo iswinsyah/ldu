@@ -245,7 +245,9 @@ try {
                 }
             }
 
-            fgetcsv($handle, 0, $delimiter); // 0 = unlimited length
+            // Buang baris pertama (Header Judul Kolom)
+            fgetcsv($handle, 0, $delimiter);
+
             $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $count = 0;
             
@@ -260,12 +262,15 @@ try {
                 if(empty(trim($nama))) $nama = 'Hamba Allah';
                 $gender = isset($row[3]) ? trim($row[3]) : '-';
                 
-                // JURUS DETEKSI TANGGAL: Perbaiki jika Google Sheets memakai format DD/MM/YYYY
+                // Terjemahkan nama bulan Indonesia ke Inggris agar PHP paham
                 $raw_waktu = isset($row[4]) ? str_replace('/', '-', trim($row[4])) : '';
-                $waktu = (!empty(trim($raw_waktu)) && strtotime($raw_waktu)) ? date('Y-m-d H:i:s', strtotime($raw_waktu)) : date('Y-m-d H:i:s');
+                $indo_months = ['januari'=>'jan', 'februari'=>'feb', 'maret'=>'mar', 'april'=>'apr', 'mei'=>'may', 'juni'=>'jun', 'juli'=>'jul', 'agustus'=>'aug', 'september'=>'sep', 'oktober'=>'oct', 'november'=>'nov', 'desember'=>'dec'];
+                $en_waktu = str_ireplace(array_keys($indo_months), array_values($indo_months), str_replace('/', '-', $raw_waktu));
+                $waktu = (!empty(trim($en_waktu)) && strtotime($en_waktu)) ? date('Y-m-d H:i:s', strtotime($en_waktu)) : date('Y-m-d H:i:s');
                 
                 $total_donasi = isset($row[5]) ? floatval(preg_replace('/[^0-9]/', '', $row[5])) : 0;
                 $frekuensi = isset($row[6]) ? intval($row[6]) : 1;
+                $frekuensi = $frekuensi <= 0 ? 1 : $frekuensi; // Minimal 1 kali donasi
                 $program = isset($row[7]) ? trim($row[7]) : '-';
                 
                 // AI Pelabelan RFM Otomatis

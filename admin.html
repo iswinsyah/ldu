@@ -145,9 +145,12 @@
             <div id="section-ai1" class="hidden">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Agen AI 1: Analisis Data & Riset Persona</h2>
                 
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex items-start">
-                    <i class="fas fa-info-circle text-xl mr-3 mt-0.5"></i> 
-                    <p>Agen AI ini bertugas membaca dan menganalisa <strong>Data Pengunjung (Mata LDU)</strong> yang terekam di sistem, lalu menyajikannya menjadi ulasan performa web dan profil audiens yang mudah dipahami.</p>
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-xl mr-3 mt-0.5"></i> 
+                        <p>Agen AI ini bertugas membaca dan menganalisa <strong>Data Pengunjung (Mata LDU)</strong> yang terekam di sistem, lalu menyajikannya menjadi ulasan performa web dan profil audiens yang mudah dipahami.</p>
+                    </div>
+                    <button onclick="resetGeminiKey()" class="whitespace-nowrap text-xs bg-blue-200 hover:bg-blue-300 text-blue-800 font-bold px-3 py-1.5 rounded transition"><i class="fas fa-key mr-1"></i> Ubah API Key</button>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6 text-center">
@@ -172,9 +175,12 @@
             <div id="section-ai2" class="hidden">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Agen AI 2: Generator Program Donasi</h2>
                 
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex items-start">
-                    <i class="fas fa-magic text-xl mr-3 mt-0.5"></i> 
-                    <p>Agen AI ini bertugas membuatkan <strong>Judul, Target Dana, dan Artikel Copywriting</strong> untuk program penggalangan dana Anda secara otomatis.</p>
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-magic text-xl mr-3 mt-0.5"></i> 
+                        <p>Agen AI ini bertugas membuatkan <strong>Judul, Target Dana, dan Artikel Copywriting</strong> untuk program penggalangan dana Anda secara otomatis.</p>
+                    </div>
+                    <button onclick="resetGeminiKey()" class="whitespace-nowrap text-xs bg-blue-200 hover:bg-blue-300 text-blue-800 font-bold px-3 py-1.5 rounded transition"><i class="fas fa-key mr-1"></i> Ubah API Key</button>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
@@ -554,9 +560,26 @@
     }
 
     // ==========================================
+    // FUNGSI MANAJEMEN API KEY GEMINI LOKAL
+    // ==========================================
+    function getGeminiKey() {
+        let key = localStorage.getItem('GEMINI_API_KEY');
+        if (!key) {
+            key = prompt("Sistem Keamanan LDU:\nMasukkan API Key Gemini Anda yang BARU.\n\n(Aman Bos! Key ini tidak akan di-push ke GitHub, tapi hanya disimpan di brankas browser laptop ini saja)");
+            if (key && key.trim() !== '') { localStorage.setItem('GEMINI_API_KEY', key.trim()); }
+            else { return null; }
+        }
+        return localStorage.getItem('GEMINI_API_KEY');
+    }
+    function resetGeminiKey() { localStorage.removeItem('GEMINI_API_KEY'); getGeminiKey(); }
+
+    // ==========================================
     // FUNGSI AGEN AI 1: RISET DAN ANALISA
     // ==========================================
     document.getElementById('btn-ai1-analyze').addEventListener('click', async function() {
+        const geminiKey = getGeminiKey();
+        if (!geminiKey) return;
+
         const btn = this;
         const originalBtnHTML = btn.innerHTML;
         btn.disabled = true;
@@ -589,7 +612,7 @@
             const promptTopic = `Tolong analisa secara profesional data audiens web LDU berikut: ${cleanStat}. Berikan kesimpulan karakter audiensnya secara singkat.`;
 
             // 3. Panggil Agen AI Langsung via Hostinger PHP (Bypass Google Script & Anti Error)
-            const aiResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'call_ai', prompt: promptTopic }) });
+            const aiResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'call_ai', prompt: promptTopic, api_key: geminiKey }) });
             const aiResult = await aiResponse.json();
             
             if (aiResult.status === "success") {
@@ -619,6 +642,9 @@
         const promptInput = document.getElementById('ai2-prompt').value.trim();
         if (!promptInput) return alert("Mohon isi ide program atau instruksi terlebih dahulu, Bos!");
 
+        const geminiKey = getGeminiKey();
+        if (!geminiKey) return;
+
         const btn = this;
         const originalBtnHTML = btn.innerHTML;
         btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI Sedang Menulis...';
@@ -632,7 +658,7 @@
             const cleanPrompt = promptInput.replace(/[\r\n\t"'\\]/g, " ").trim();
             const fullPrompt = `Anda adalah ahli Copywriting Fundraising profesional. Buatkan materi kampanye penggalangan dana dari ide berikut: ${cleanPrompt}. Susun jawaban PERSIS dengan format ini (tanpa markdown tebal/miring dan tambahan apa pun): \nJUDUL: [Tulis Judul clickbait]\nTARGET DANA: [Tulis angka saja, misal 50000000]\nARTIKEL:\n[Tulis artikel copywriting minimal 3 paragraf]`;
 
-            const aiResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'call_ai', prompt: fullPrompt }) });
+            const aiResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'call_ai', prompt: fullPrompt, api_key: geminiKey }) });
             const aiResult = await aiResponse.json();
             
             if (aiResult.status === "success") {

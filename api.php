@@ -186,8 +186,8 @@ try {
         )");
 
         // Otomatis tambahkan kolom baru jika belum ada di database
-        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `gender` VARCHAR(10) DEFAULT '-' AFTER `whatsapp`");
-        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `program` VARCHAR(255) DEFAULT '-' AFTER `gender`");
+        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN IF NOT EXISTS `gender` VARCHAR(10) DEFAULT '-' AFTER `whatsapp`");
+        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN IF NOT EXISTS `program` VARCHAR(255) DEFAULT '-' AFTER `gender`");
 
         // Pagination & Pencarian
         $page = isset($data['page']) ? max(1, intval($data['page'])) : 1;
@@ -247,54 +247,66 @@ try {
 
             // JURUS MATA ELANG: Baca Header untuk mencari posisi kolom secara otomatis!
             $headers = fgetcsv($handle, 0, $delimiter);
-            
-            // Urutan default jika tidak ketemu judulnya (0:No, 1:WA, 2:Nama, 3:L/P, 4:Tgl, 5:Jumlah, 6:Frek, 7:Program)
-            $c_wa = 1; $c_nama = 2; $c_gender = 3; $c_tgl = 4; $c_jumlah = 5; $c_frek = 6; $c_prog = 7;
+            // Remove UTF-8 BOM if present in first header cell
+            if (isset($headers[0]) && substr($headers[0], 0, 3) === "\xEF\xBB\xBF") {
+                $headers[0] = substr($headers[0], 3);
+            }
+
+            // Initialize column indices to -1 (not found)
+            $c_wa = $c_nama = $c_gender = $c_tgl = $c_jumlah = $c_frek = $c_prog = -1;
             
             if ($headers) {
                 foreach ($headers as $i => $h) {
-                    $hl = strtolower(preg_replace('/[^a-z0-9]/i', '', $h)); // Bersihkan teks header
-                    if (strpos($hl, 'nama') !== false && strpos($hl, 'program') === false) { $c_nama = $i; }
-                    elseif (strpos($hl, 'wa') !== false || strpos($hl, 'whatsapp') !== false || strpos($hl, 'hp') !== false) { $c_wa = $i; }
-                    elseif (strpos($hl, 'lp') !== false || strpos($hl, 'kelamin') !== false || strpos($hl, 'gender') !== false) { $c_gender = $i; }
-                    elseif (strpos($hl, 'tgl') !== false || strpos($hl, 'tanggal') !== false || strpos($hl, 'waktu') !== false) { $c_tgl = $i; }
-                    elseif (strpos($hl, 'jumlah') !== false || strpos($hl, 'donasi') !== false || strpos($hl, 'nominal') !== false || strpos($hl, 'total') !== false) { $c_jumlah = $i; }
-                    elseif (strpos($hl, 'frek') !== false || strpos($hl, 'kali') !== false) { $c_frek = $i; }
-                    elseif (strpos($hl, 'program') !== false || strpos($hl, 'kampanye') !== false) { $c_prog = $i; }
+                    $hl = preg_replace('/[^a-z0-9]/i', '', strtolower($h));
+                    // Use strpos for broader matching (e.g., "nama donatur", "whatsapp nomor")
+                    if (strpos($hl, 'nama') !== false) { $c_nama = $i; }
+                    elseif (strpos($hl, 'wa') !== false || strpos($hl, 'whatsapp') !== false) { $c_wa = $i; }
+                    elseif (strpos($hl, 'gender') !== false || strpos($hl, 'jk') !== false) { $c_gender = $i; }
+                    elseif (strpos($hl, 'tgl') !== false || strpos($hl, 'tanggal') !== false) { $c_tgl = $i; }
+                    elseif (strpos($hl, 'jumlah') !== false || strpos($hl, 'donasi') !== false || strpos($hl, 'nominal') !== false) { $c_jumlah = $i; }
+                    elseif (strpos($hl, 'frek') !== false || strpos($hl, 'frekuensi') !== false) { $c_frek = $i; }
+                    elseif (strpos($hl, 'program') !== false || strpos($hl, 'campaign') !== false) { $c_prog = $i; }
                 }
             }
+
+            // Set fallback defaults if columns not detected
+            if ($c_wa === -1) $c_wa = 1;
+            if ($c_nama === -1) $c_nama = 2;
+            if ($c_gender === -1) $c_gender = 3;
+            if ($c_tgl === -1) $c_tgl = 4;
+            if ($c_jumlah === -1) $c_jumlah = 5;
+            if ($c_frek === -1) $c_frek = 6;
+            if ($c_prog === -1) $c_prog = 7;
 
             $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $count = 0;
             
-            $conn->autocommit(FALSE); // Optimasi kecepatan tinggi untuk 13.000 data
+            $conn->autocommit(FALSE); // Optimasi kecepatan tinggi
             
             while (($row = fgetcsv($handle, 0, $delimiter)) !== FALSE) {
-                if (empty(array_filter($row))) continue; // Lewati baris kosong
+                if (empty(array_filter($row))) continue;
 
-                // Ambil data sesuai dengan posisi kolom yang ditemukan Mata Elang
-                $whatsapp = isset($row[$c_wa]) ? trim($row[$c_wa]) : '';
-                $nama = isset($row[$c_nama]) ? trim($row[$c_nama]) : 'Hamba Allah';
-                if(empty(trim($nama))) $nama = 'Hamba Allah';
-                $gender = isset($row[$c_gender]) ? trim($row[$c_gender]) : '-';
+                $whatsapp = ($c_wa !== -1 && isset($row[$c_wa])) ? trim($row[$c_wa]) : '';
+                $nama = ($c_nama !== -1 && isset($row[$c_nama])) ? trim($row[$c_nama]) : 'Hamba Allah';
                 
-                // Terjemahkan nama bulan Indonesia ke Inggris agar PHP paham
-                $raw_waktu = isset($row[$c_tgl]) ? str_replace('/', '-', trim($row[$c_tgl])) : '';
+                // Skip jika data penting kosong
+                if (empty($whatsapp) && empty($nama)) continue;
+                if(empty(trim($nama))) $nama = 'Hamba Allah';
+
+                $gender = ($c_gender !== -1 && isset($row[$c_gender])) ? trim($row[$c_gender]) : '-';
+                
+                $raw_waktu = ($c_tgl !== -1 && isset($row[$c_tgl])) ? str_replace('/', '-', trim($row[$c_tgl])) : '';
                 $indo_months = ['januari'=>'jan', 'februari'=>'feb', 'maret'=>'mar', 'april'=>'apr', 'mei'=>'may', 'juni'=>'jun', 'juli'=>'jul', 'agustus'=>'aug', 'september'=>'sep', 'oktober'=>'oct', 'november'=>'nov', 'desember'=>'dec'];
                 $en_waktu = str_ireplace(array_keys($indo_months), array_values($indo_months), str_replace('/', '-', $raw_waktu));
                 $waktu = (!empty(trim($en_waktu)) && strtotime($en_waktu)) ? date('Y-m-d H:i:s', strtotime($en_waktu)) : date('Y-m-d H:i:s');
                 
-                $total_donasi = isset($row[$c_jumlah]) ? floatval(preg_replace('/[^0-9]/', '', $row[$c_jumlah])) : 0;
-                $frekuensi = isset($row[$c_frek]) ? intval(preg_replace('/[^0-9]/', '', $row[$c_frek])) : 1;
-                $frekuensi = $frekuensi <= 0 ? 1 : $frekuensi; // Minimal 1 kali donasi
+                $total_donasi = ($c_jumlah !== -1 && isset($row[$c_jumlah])) ? floatval(preg_replace('/[^0-9]/', '', $row[$c_jumlah])) : 0;
+                $frekuensi = ($c_frek !== -1 && isset($row[$c_frek])) ? intval(preg_replace('/[^0-9]/', '', $row[$c_frek])) : 1;
+                $frekuensi = $frekuensi <= 0 ? 1 : $frekuensi;
                 
-                $program = isset($row[$c_prog]) ? trim($row[$c_prog]) : '-';
-                // Bersihkan error Excel yang terbawa ke CSV (seperti #DIV/0! atau #VALUE!)
-                if (strpos($program, '#') === 0) {
-                    $program = '-';
-                }
+                $program = ($c_prog !== -1 && isset($row[$c_prog])) ? trim($row[$c_prog]) : '-';
+                if (strpos($program, '#') === 0) $program = '-';
                 
-                // AI Pelabelan RFM Otomatis
                 $kategori = "Kecil Jarang";
                 if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "Besar Rutin"; }
                 else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
@@ -307,7 +319,7 @@ try {
             $conn->commit();
             fclose($handle);
             $stmt->close();
-            ini_set('auto_detect_line_endings', false); // Kembalikan settingan default
+            ini_set('auto_detect_line_endings', false); 
             die(json_encode(["status" => "success", "message" => "Alhamdulillah! $count data donatur berhasil diimport & dikategorikan!"]));
         }
     }
@@ -359,14 +371,39 @@ try {
     }
 
     // =======================================================
+    // 4.4e JALUR KHUSUS: TAMBAH DATA DONASI MANUAL
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'add_donatur_manual') {
+        $nama = $data['nama'] ?? 'Hamba Allah';
+        if(empty(trim($nama))) $nama = 'Hamba Allah';
+        $whatsapp = $data['whatsapp'] ?? '';
+        $gender = $data['gender'] ?? '-';
+        $waktu = $data['waktu'] ?? date('Y-m-d H:i:s');
+        $total_donasi = floatval($data['jumlah'] ?? 0);
+        $frekuensi = intval($data['frek'] ?? 1);
+        $program = $data['program'] ?? '-';
+        
+        $kategori = "Kecil Jarang";
+        if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "Besar Rutin"; }
+        else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
+        else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "Kecil Rutin"; }
+        
+        $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssdiss", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori);
+        
+        if ($stmt->execute()) { die(json_encode(["status" => "success", "message" => "Mantap! Data donasi manual berhasil masuk tabel!"])); } 
+        else { die(json_encode(["status" => "error", "message" => "Gagal menyimpan data: " . $stmt->error])); }
+    }
+
+    // =======================================================
     // 4.5 JALUR KHUSUS: AI AGENT (GEMINI API VIA PHP)
     // =======================================================
     if (isset($data['action']) && $data['action'] === 'call_ai') {
-        // TULIS API KEY GEMINI BOS DI SINI (DAPATKAN DARI GOOGLE AI STUDIO)
-        $GEMINI_API_KEY = "AIzaSyCMSLHbNvcZlG5NdydU37bijTwwcDcyZnQ"; 
+        // AMBIL API KEY DARI REQUEST BROWSER (LEBIH AMAN, TIDAK TEREKAM DI GITHUB)
+        $GEMINI_API_KEY = $data['api_key'] ?? ''; 
         
-        if (empty($GEMINI_API_KEY) || $GEMINI_API_KEY === "MASUKKAN_API_KEY_GEMINI_BOS_DISINI") {
-            die(json_encode(["status" => "error", "message" => "API Key Gemini belum diisi di dalam file api.php Bos!"]));
+        if (empty($GEMINI_API_KEY)) {
+            die(json_encode(["status" => "error", "message" => "API Key Gemini tidak dikirim dari browser."]));
         }
 
         $prompt = $data['prompt'] ?? '';

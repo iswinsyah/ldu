@@ -844,7 +844,7 @@
 
     function copyToClipboard(text) { navigator.clipboard.writeText(text); alert("URL Gambar Tersalin! Tinggal Paste di Form Program.\n\n" + text); }
 
-    document.getElementById('media-upload-input').addEventListener('change', function(e) {
+    document.getElementById('media-upload-input').addEventListener('change', async function(e) {
         const file = e.target.files[0];
         if (!file) return;
         
@@ -855,25 +855,27 @@
             return;
         }
         
-        const reader = new FileReader();
-        reader.onload = async function(event) {
-            const btn = document.getElementById('btn-upload-media');
-            const originalText = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengupload...';
+        const btn = document.getElementById('btn-upload-media');
+        const originalText = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengupload...';
+        
+        const formData = new FormData();
+        formData.append('token', HOSTINGER_TOKEN);
+        formData.append('action', 'upload_media');
+        formData.append('file', file);
+        
+        try {
+            const response = await fetch(HOSTINGER_API, { method: 'POST', body: formData });
+            const responseText = await response.text(); // Ambil respon mentah dulu
+            let result;
             try {
-                const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'upload_media', filename: file.name, file_base64: event.target.result }) });
-                const responseText = await response.text(); // Ambil respon mentah dulu
-                let result;
-                try {
-                    result = JSON.parse(responseText);
-                } catch (parseError) {
-                    throw new Error("Respon server bukan JSON. Kemungkinan diblokir Hostinger. Detail: " + responseText.substring(0, 100));
-                }
-                if (result.status === 'success') { loadMedia(); } else { alert("Gagal upload: " + result.message); }
-            } catch (error) { alert("Error upload: " + error.message); } 
-            finally { btn.disabled = false; btn.innerHTML = originalText; e.target.value = ""; }
-        };
-        reader.readAsDataURL(file);
+                result = JSON.parse(responseText);
+            } catch (parseError) {
+                throw new Error("Respon server bukan JSON. Kemungkinan diblokir Hostinger. Detail: " + responseText.substring(0, 100));
+            }
+            if (result.status === 'success') { loadMedia(); } else { alert("Gagal upload: " + result.message); }
+        } catch (error) { alert("Error upload: " + error.message); } 
+        finally { btn.disabled = false; btn.innerHTML = originalText; e.target.value = ""; }
     });
     </script>
 </body>

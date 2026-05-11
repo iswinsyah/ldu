@@ -12,7 +12,9 @@ mysqli_report(MYSQLI_REPORT_OFF);
 // =======================================================
 $TOKEN_RAHASIA = "LduBerkah999!";
 
-$data = json_decode(file_get_contents("php://input"), true);
+// Coba tangkap data dari POST biasa (FormData) atau JSON
+$data_json = json_decode(file_get_contents("php://input"), true);
+$data = is_array($data_json) ? $data_json : $_POST;
 
 if (!isset($data['token']) || $data['token'] !== $TOKEN_RAHASIA) {
     die(json_encode(["status" => "error", "message" => "Akses Ditolak! Kunci rahasia salah."]));

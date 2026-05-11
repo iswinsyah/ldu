@@ -240,6 +240,48 @@ try {
         }
     }
 
+    // =======================================================
+    // 4.5 JALUR KHUSUS: AI AGENT (GEMINI API VIA PHP)
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'call_ai') {
+        // TULIS API KEY GEMINI BOS DI SINI (DAPATKAN DARI GOOGLE AI STUDIO)
+        $GEMINI_API_KEY = "MASUKKAN_API_KEY_GEMINI_BOS_DISINI"; 
+        
+        if ($GEMINI_API_KEY === "MASUKKAN_API_KEY_GEMINI_BOS_DISINI") {
+            die(json_encode(["status" => "error", "message" => "API Key Gemini belum diisi di dalam file api.php Bos!"]));
+        }
+
+        $prompt = $data['prompt'] ?? '';
+        if (empty($prompt)) {
+            die(json_encode(["status" => "error", "message" => "Prompt kosong."]));
+        }
+
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $GEMINI_API_KEY;
+        $postData = json_encode([ "contents" => [ ["parts" => [["text" => $prompt]]] ] ]);
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($err) {
+            die(json_encode(["status" => "error", "message" => "Gagal menghubungi server Google API: " . $err]));
+        }
+
+        $result = json_decode($response, true);
+        if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
+            die(json_encode(["status" => "success", "data" => $result['candidates'][0]['content']['parts'][0]['text']]));
+        } else {
+            $errorMsg = $result['error']['message'] ?? "Format balasan tidak dikenali.";
+            die(json_encode(["status" => "error", "message" => "Gemini API Error: " . $errorMsg]));
+        }
+    }
+
     // 5. JALUR KHUSUS: EKSEKUSI SQL DARI GOOGLE APPS SCRIPT
     $sql = isset($data['sql_base64']) ? base64_decode($data['sql_base64']) : ($data['sql'] ?? '');
     $params = $data['params'] ?? [];

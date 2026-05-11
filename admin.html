@@ -475,9 +475,8 @@
             const cleanStat = statText.replace(/[\r\n\t"'\\]/g, " ").trim();
             const promptTopic = `Tolong analisa secara profesional data audiens web LDU berikut: ${cleanStat}. Berikan kesimpulan karakter audiensnya secara singkat.`;
 
-            // 3. Panggil Agen AI via Google Apps Script Endpoint
-            const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
-            const aiResponse = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ type: 'run_research', topic: promptTopic }) });
+            // 3. Panggil Agen AI Langsung via Hostinger PHP (Bypass Google Script & Anti Error)
+            const aiResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'call_ai', prompt: promptTopic }) });
             const aiResult = await aiResponse.json();
             
             if (aiResult.status === "success") {

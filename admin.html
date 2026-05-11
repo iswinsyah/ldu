@@ -692,8 +692,20 @@
                     result.data.forEach((d, index) => {
                         let no = ((page - 1) * 100) + index + 1;
                         let gender = d.gender || '-';
-                        let tgl = d.waktu ? new Date(d.waktu.replace(" ", "T")).toLocaleDateString('id-ID') : '-';
-                        let hari = d.waktu ? new Date(d.waktu.replace(" ", "T")).toLocaleDateString('id-ID', { weekday: 'long' }) : '-';
+                        
+                        let tgl = '-';
+                        let hari = '-';
+                        if (d.waktu && d.waktu !== '0000-00-00 00:00:00') {
+                            let wParts = d.waktu.split(' ')[0].split('-');
+                            if (wParts.length === 3) {
+                                let dateObj = new Date(wParts[0], wParts[1] - 1, wParts[2]);
+                                if (!isNaN(dateObj)) {
+                                    tgl = dateObj.toLocaleDateString('id-ID');
+                                    hari = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+                                }
+                            }
+                        }
+                        
                         let program = d.program || '-';
                         
                         tbody.innerHTML += `

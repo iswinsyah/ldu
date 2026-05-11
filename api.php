@@ -185,9 +185,15 @@ try {
             `kategori` VARCHAR(50)
         )");
 
-        // Otomatis tambahkan kolom baru jika belum ada di database
-        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN IF NOT EXISTS `gender` VARCHAR(10) DEFAULT '-' AFTER `whatsapp`");
-        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN IF NOT EXISTS `program` VARCHAR(255) DEFAULT '-' AFTER `gender`");
+        // Otomatis tambahkan kolom baru jika belum ada di database (Kompatibel untuk semua versi MySQL)
+        $colCheck1 = $conn->query("SHOW COLUMNS FROM `data_donatur` LIKE 'gender'");
+        if ($colCheck1 && $colCheck1->num_rows === 0) {
+            $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `gender` VARCHAR(10) DEFAULT '-' AFTER `whatsapp`");
+        }
+        $colCheck2 = $conn->query("SHOW COLUMNS FROM `data_donatur` LIKE 'program'");
+        if ($colCheck2 && $colCheck2->num_rows === 0) {
+            $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `program` VARCHAR(255) DEFAULT '-' AFTER `gender`");
+        }
 
         // Pagination & Pencarian
         $page = isset($data['page']) ? max(1, intval($data['page'])) : 1;
@@ -261,7 +267,7 @@ try {
                     // Use strpos for broader matching (e.g., "nama donatur", "whatsapp nomor")
                     if (strpos($hl, 'nama') !== false) { $c_nama = $i; }
                     elseif (strpos($hl, 'wa') !== false || strpos($hl, 'whatsapp') !== false) { $c_wa = $i; }
-                    elseif (strpos($hl, 'gender') !== false || strpos($hl, 'jk') !== false) { $c_gender = $i; }
+                    elseif (strpos($hl, 'gender') !== false || strpos($hl, 'jk') !== false || strpos($hl, 'lp') !== false) { $c_gender = $i; }
                     elseif (strpos($hl, 'tgl') !== false || strpos($hl, 'tanggal') !== false) { $c_tgl = $i; }
                     elseif (strpos($hl, 'jumlah') !== false || strpos($hl, 'donasi') !== false || strpos($hl, 'nominal') !== false) { $c_jumlah = $i; }
                     elseif (strpos($hl, 'frek') !== false || strpos($hl, 'frekuensi') !== false) { $c_frek = $i; }
@@ -414,6 +420,8 @@ try {
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // WAJIB: Ikuti pantulan (redirect) URL dari server Google
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Anti-Error SSL saat dites di jaringan Localhost (XAMPP/Laragon)
 
         $response = curl_exec($ch);
         $err = curl_error($ch);

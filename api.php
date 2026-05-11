@@ -4,7 +4,14 @@
 // =======================================================
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+// Jawab sinyal Preflight dari browser (CORS) WAJIB UNTUK WEB LIVE
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 mysqli_report(MYSQLI_REPORT_OFF);
 
 $TOKEN_RAHASIA = "LduBerkah999!";
@@ -37,17 +44,33 @@ try {
     
     // 4. JALUR KHUSUS: UPLOAD GAMBAR FISIK
     if (isset($data['action']) && $data['action'] === 'upload_media') {
-        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        if (!isset($_FILES['file'])) {
             die(json_encode(["status" => "error", "message" => "Tidak ada file fisik yang diterima server."]));
         }
         
         $file = $_FILES['file'];
+        $file_error = $file['error'];
+        
+        // Pengecekan error native PHP
+        if ($file_error !== 0) {
+            die(json_encode(["status" => "error", "message" => "Error upload PHP kode: " . $file_error]));
+        }
+
         $original_name = $file['name'];
-        $ext = pathinfo($original_name, PATHINFO_EXTENSION);
-        $new_name = uniqid('media_') . '.' . $ext;
+        // Terapkan strtolower seperti di kode Bos
+        $file_ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
+        
+        // Batasi ekstensi (keamanan)
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!in_array($file_ext, $allowed_ext)) {
+            die(json_encode(["status" => "error", "message" => "Ekstensi file tidak diizinkan."]));
+        }
+
+        $new_name = uniqid('media_') . '.' . $file_ext;
         
         $upload_dir = 'uploads/';
-        if (!is_dir($upload_dir)) {
+        // Gunakan file_exists seperti di kode Bos
+        if (!file_exists($upload_dir)) {
             if (!mkdir($upload_dir, 0777, true)) {
                 die(json_encode(["status" => "error", "message" => "Gagal membuat folder uploads/."]));
             }
@@ -55,7 +78,8 @@ try {
         
         if (move_uploaded_file($file['tmp_name'], $upload_dir . $new_name)) {
             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-            $file_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . "/" . $upload_dir . $new_name;
+            $base_url = rtrim(dirname($_SERVER['PHP_SELF']), '/');
+            $file_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $base_url . "/" . $upload_dir . $new_name;
             
             $stmt = $conn->prepare("INSERT INTO data_media (waktu, nama_file, url) VALUES (NOW(), ?, ?)");
             if (!$stmt) {

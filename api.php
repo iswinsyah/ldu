@@ -212,35 +212,49 @@ try {
             die(json_encode(["status" => "error", "message" => "Tidak ada file CSV yang diterima."]));
         }
         
+        // JURUS ANTI-ERROR: Deteksi garis baru dari berbagai jenis OS / Google Sheets
+        ini_set('auto_detect_line_endings', true);
         $file = $_FILES['file_csv']['tmp_name'];
         
         $handle = fopen($file, "r");
         if ($handle !== FALSE) {
-            // Otomatis deteksi delimiter dari baris pertama (header) agar lebih efisien
+            // JURUS SUPER DETEKSI PEMISAH KOLOM (Koma, Titik Koma, atau Tab)
             $header_line = fgets($handle);
             rewind($handle); // Kembalikan pointer ke awal file
-            $delimiter = (strpos($header_line, ';') !== false) ? ';' : ',';
+            
+            $delimiters = [',', ';', "\t"];
+            $delimiter = ',';
+            $max_cols = 0;
+            foreach ($delimiters as $delim) {
+                $cols = count(str_getcsv($header_line, $delim));
+                if ($cols > $max_cols) {
+                    $max_cols = $cols;
+                    $delimiter = $delim;
+                }
+            }
 
-            fgetcsv($handle, 1000, $delimiter); // Lewati baris pertama (Header Judul Kolom)
+            fgetcsv($handle, 0, $delimiter); // 0 = unlimited length
             $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $count = 0;
             
             $conn->autocommit(FALSE); // Optimasi kecepatan tinggi untuk 13.000 data
             
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
+            while (($row = fgetcsv($handle, 0, $delimiter)) !== FALSE) {
+                if (empty(array_filter($row))) continue; // Lewati baris kosong
+
                 // Format Baru Excel: 0:No | 1:WhatsApp | 2:Nama | 3:L/P | 4:Tgl | 5:Jumlah | 6:Frekuensi | 7:Program
-                $whatsapp = $row[1] ?? '';
-                $nama = $row[2] ?? 'Hamba Allah';
+                $whatsapp = isset($row[1]) ? trim($row[1]) : '';
+                $nama = isset($row[2]) ? trim($row[2]) : 'Hamba Allah';
                 if(empty(trim($nama))) $nama = 'Hamba Allah';
-                $gender = $row[3] ?? '-';
+                $gender = isset($row[3]) ? trim($row[3]) : '-';
                 
-                $raw_waktu = $row[4] ?? '';
+                // JURUS DETEKSI TANGGAL: Perbaiki jika Google Sheets memakai format DD/MM/YYYY
+                $raw_waktu = isset($row[4]) ? str_replace('/', '-', trim($row[4])) : '';
                 $waktu = (!empty(trim($raw_waktu)) && strtotime($raw_waktu)) ? date('Y-m-d H:i:s', strtotime($raw_waktu)) : date('Y-m-d H:i:s');
                 
-                // PERBAIKAN UTAMA: Membersihkan format mata uang (Rp, titik, koma) agar hanya angka murni yang masuk
                 $total_donasi = isset($row[5]) ? floatval(preg_replace('/[^0-9]/', '', $row[5])) : 0;
                 $frekuensi = isset($row[6]) ? intval($row[6]) : 1;
-                $program = $row[7] ?? '-';
+                $program = isset($row[7]) ? trim($row[7]) : '-';
                 
                 // AI Pelabelan RFM Otomatis
                 $kategori = "Kecil Jarang";
@@ -255,6 +269,7 @@ try {
             $conn->commit();
             fclose($handle);
             $stmt->close();
+            ini_set('auto_detect_line_endings', false); // Kembalikan settingan default
             die(json_encode(["status" => "success", "message" => "Alhamdulillah! $count data donatur berhasil diimport & dikategorikan!"]));
         }
     }

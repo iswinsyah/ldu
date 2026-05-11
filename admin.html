@@ -23,6 +23,9 @@
             <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-chart-pie w-5"></i> Dashboard
             </a>
+            <a href="#" id="nav-ai1" onclick="switchTab('ai1')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
+                <i class="fas fa-brain w-5"></i> AI 1 Analis Data
+            </a>
             <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-bullhorn w-5"></i> Program
             </a>
@@ -129,6 +132,30 @@
                             <div>Memuat...</div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- AI 1 Analis Data -->
+            <div id="section-ai1" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Agen AI 1: Analisis Data & Riset Persona</h2>
+                
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex items-start">
+                    <i class="fas fa-info-circle text-xl mr-3 mt-0.5"></i> 
+                    <p>Agen AI ini bertugas merumuskan <strong>Buyer Persona (Target Donatur Potensial)</strong>. Jika data statistik "Mata LDU" masih minim, AI akan otomatis melakukan riset mandiri berbekal kecerdasannya untuk jenis program yang Anda tentukan.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Jenis Program Penggalangan Dana:</label>
+                    <input type="text" id="ai1-program-type" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 mb-4" placeholder="Contoh: Pembangunan Masjid Pelosok, Beasiswa Santri Yatim, dll">
+                    
+                    <button id="btn-ai1-analyze" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md flex items-center">
+                        <i class="fas fa-magic mr-2"></i> Riset dan Analisa Sekarang
+                    </button>
+                </div>
+
+                <div id="ai1-result-container" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-clipboard-check text-green-600 mr-2"></i> Hasil Analisis Persona Donatur</h3>
+                    <div id="ai1-result-content" class="text-gray-700 text-sm leading-relaxed space-y-3"></div>
                 </div>
             </div>
 
@@ -314,6 +341,7 @@
     function switchTab(tabName) {
         // Sembunyikan semua section
         document.getElementById('section-dashboard').classList.add('hidden');
+        document.getElementById('section-ai1').classList.add('hidden');
         document.getElementById('section-program').classList.add('hidden');
         document.getElementById('section-media').classList.add('hidden');
         
@@ -322,6 +350,7 @@
         const activeClasses = "flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium cursor-pointer";
         
         document.getElementById('nav-dashboard').className = navClasses;
+        document.getElementById('nav-ai1').className = navClasses;
         document.getElementById('nav-program').className = navClasses;
         document.getElementById('nav-media').className = navClasses;
         
@@ -332,9 +361,68 @@
         // Ubah Judul Header
         const headerTitle = document.getElementById('header-title');
         if (tabName === 'dashboard') { headerTitle.innerText = "Dashboard Statistik"; loadDashboard(); }
+        if (tabName === 'ai1') headerTitle.innerText = "AI 1 Analis Data";
         if (tabName === 'program') headerTitle.innerText = "Program";
         if (tabName === 'media') { headerTitle.innerText = "Media & Gambar"; loadMedia(); }
     }
+
+    // ==========================================
+    // FUNGSI AGEN AI 1: RISET DAN ANALISA
+    // ==========================================
+    document.getElementById('btn-ai1-analyze').addEventListener('click', async function() {
+        const programType = document.getElementById('ai1-program-type').value.trim();
+        if (!programType) {
+            alert("Mohon isi jenis program penggalangan dana terlebih dahulu, Bos!");
+            return;
+        }
+
+        const btn = this;
+        const originalBtnHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI Sedang Meriset...';
+        
+        const resultContainer = document.getElementById('ai1-result-container');
+        const resultContent = document.getElementById('ai1-result-content');
+        resultContainer.classList.remove('hidden');
+        resultContent.innerHTML = '<p class="text-gray-500 italic"><i class="fas fa-cog fa-spin mr-2"></i> Menganalisa statistik web dan meriset data internet... (Proses ini bisa memakan waktu 10-30 detik)</p>';
+
+        try {
+            // 1. Ambil data statistik saat ini dari Hostinger
+            const statResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'get_stats' }) });
+            const statResult = await statResponse.json();
+            
+            let statText = "Data pengunjung web saat ini sangat minim/kosong.";
+            if (statResult.status === 'success') {
+                const d = statResult.data;
+                const total = d.kunjungan.total;
+                if(total > 0) {
+                    const kotaTop = d.asal_kota.length > 0 ? d.asal_kota[0].kota : '-';
+                    statText = `Total Kunjungan Web: ${total}. Kota domisili terbanyak: ${kotaTop}.`;
+                }
+            }
+
+            // 2. Susun Prompt Super Cerdas untuk AI
+            const promptTopic = `Tolong riset dan rumuskan "Buyer Persona" (Target Donatur Potensial) yang sangat detail untuk program penggalangan dana: "${programType}". Sebagai informasi tambahan, statistik audiens web LDU saat ini adalah: ${statText}. Jika data web minim/kosong, abaikan data tersebut dan silakan gunakan kemampuan riset mandiri Anda menggunakan data empiris dari internet tentang perilaku donatur program sejenis. Buatkan struktur hasil: 1. Demografi, 2. Psikografi (Pain points & Goals), 3. Perilaku Digital, 4. Saran Angle Copywriting Iklan.`;
+
+            // 3. Panggil Agen AI via Google Apps Script Endpoint
+            const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
+            const aiResponse = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ type: 'run_research', topic: promptTopic }) });
+            const aiResult = await aiResponse.json();
+            
+            if (aiResult.status === "success") {
+                // Bersihkan teks markdown AI dan ubah newline jadi <br>
+                let formattedText = aiResult.data.replace(/\*\*/g, '<b>').replace(/\*/g, '•').replace(/\n/g, '<br>');
+                resultContent.innerHTML = formattedText;
+            } else {
+                resultContent.innerHTML = `<span class="text-red-500 font-bold">Gagal melakukan riset: ${aiResult.message}</span>`;
+            }
+        } catch (error) {
+            resultContent.innerHTML = `<span class="text-red-500 font-bold">Terjadi kesalahan koneksi ke AI: ${error.message}</span>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHTML;
+        }
+    });
 
     // Panggil dashboard saat halaman pertama kali dibuka
     switchTab('dashboard');

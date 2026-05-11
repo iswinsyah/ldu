@@ -7,34 +7,94 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 p-4 md:p-8">
+<body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
 
-    <div class="max-w-4xl mx-auto">
-        <!-- Header Sederhana -->
-        <header class="bg-white p-6 rounded-xl shadow-sm mb-6 flex justify-between items-center border border-gray-200">
-            <h1 class="text-2xl font-bold text-green-700"><i class="fas fa-leaf mr-2"></i> LDU Admin (Mulai Baru)</h1>
-            <a href="index.html" class="text-sm text-gray-500 hover:text-green-600"><i class="fas fa-home mr-1"></i> Ke Depan</a>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-green-900 text-white flex flex-col hidden md:flex">
+        <div class="h-16 flex items-center px-6 border-b border-green-800">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-leaf text-xl text-yellow-400"></i>
+                <span class="font-bold text-xl tracking-wide">LDU Admin</span>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
+                <i class="fas fa-chart-pie w-5"></i> Dashboard
+            </a>
+            <a href="#" id="nav-program" onclick="switchTab('program')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
+                <i class="fas fa-bullhorn w-5"></i> Program
+            </a>
+            <a href="#" id="nav-media" onclick="switchTab('media')" class="flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium cursor-pointer">
+                <i class="fas fa-images w-5"></i> Media / Gambar
+            </a>
+        </nav>
+        <div class="p-4 border-t border-green-800">
+            <a href="index.html" class="flex items-center gap-3 px-4 py-2 text-green-300 hover:text-white transition">
+                <i class="fas fa-sign-out-alt w-5"></i> Keluar
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Header -->
+        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 border-b border-gray-200">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-gray-500 hover:text-green-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h2 id="header-title" class="text-xl font-bold text-gray-800">Media & Gambar</h2>
+            </div>
+            <div class="flex items-center gap-2 border-l pl-4 border-gray-200">
+                <img src="https://ui-avatars.com/api/?name=Admin+Bos&background=0D8ABC&color=fff" alt="Admin" class="w-8 h-8 rounded-full">
+                <span class="font-medium text-sm hidden sm:block">Admin Bos</span>
+            </div>
         </header>
 
-        <!-- Kotak Upload -->
-        <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-200">
-            <h2 class="text-lg font-bold mb-4 border-b pb-2"><i class="fas fa-upload text-blue-500 mr-2"></i> Tes Upload Gambar</h2>
-            <div class="flex flex-col sm:flex-row gap-4 items-center">
-                <input type="file" id="media-upload-input" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-md cursor-pointer">
-                <button id="btn-upload-media" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-md transition shadow whitespace-nowrap">
-                    <i class="fas fa-cloud-upload-alt mr-2"></i> Upload File
-                </button>
+        <div class="flex-1 overflow-x-hidden overflow-y-auto p-6 bg-gray-50">
+            
+            <!-- Dashboard Placeholder -->
+            <div id="section-dashboard" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Dashboard</h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 text-gray-500 text-center py-12">
+                    <i class="fas fa-tools text-4xl mb-3 opacity-50"></i>
+                    <p>Menu ini akan segera kita bangun.</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Galeri Gambar -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h2 class="text-lg font-bold mb-4 border-b pb-2"><i class="fas fa-images text-green-500 mr-2"></i> Galeri (Folder uploads/)</h2>
-            <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <div class="col-span-full text-center text-gray-500 py-8">Memuat gambar...</div>
+            <!-- Program Placeholder -->
+            <div id="section-program" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Program Donasi</h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 text-gray-500 text-center py-12">
+                    <i class="fas fa-bullhorn text-4xl mb-3 opacity-50"></i>
+                    <p>Formulir Input Program akan diletakkan di sini.</p>
+                </div>
             </div>
+
+            <!-- Media Section (Aktif) -->
+            <div id="section-media" class="block">
+                <!-- Kotak Upload -->
+                <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-200">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2"><i class="fas fa-upload text-blue-500 mr-2"></i> Tes Upload Gambar</h2>
+                    <div class="flex flex-col sm:flex-row gap-4 items-center">
+                        <input type="file" id="media-upload-input" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-md cursor-pointer">
+                        <button id="btn-upload-media" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-md transition shadow whitespace-nowrap">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> Upload File
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Galeri Gambar -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2"><i class="fas fa-images text-green-500 mr-2"></i> Galeri (Folder uploads/)</h2>
+                    <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <div class="col-span-full text-center text-gray-500 py-8">Memuat gambar...</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
+    </main>
 
     <script>
         // ==========================================
@@ -132,6 +192,32 @@
             btn.innerHTML = originalText; 
         }
     });
+
+    // FUNGSI SWITCH TAB (Navigasi Sidebar)
+    function switchTab(tabName) {
+        // Sembunyikan semua section
+        document.getElementById('section-dashboard').classList.add('hidden');
+        document.getElementById('section-program').classList.add('hidden');
+        document.getElementById('section-media').classList.add('hidden');
+        
+        // Reset style semua nav
+        const navClasses = "flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer";
+        const activeClasses = "flex items-center gap-3 bg-green-800 px-4 py-3 rounded-lg text-white font-medium cursor-pointer";
+        
+        document.getElementById('nav-dashboard').className = navClasses;
+        document.getElementById('nav-program').className = navClasses;
+        document.getElementById('nav-media').className = navClasses;
+        
+        // Munculkan section yang dipilih dan beri warna aktif pada nav-nya
+        document.getElementById('section-' + tabName).classList.remove('hidden');
+        document.getElementById('nav-' + tabName).className = activeClasses;
+
+        // Ubah Judul Header
+        const headerTitle = document.getElementById('header-title');
+        if (tabName === 'dashboard') headerTitle.innerText = "Overview";
+        if (tabName === 'program') headerTitle.innerText = "Program";
+        if (tabName === 'media') { headerTitle.innerText = "Media & Gambar"; loadMedia(); }
+    }
 
     // Panggil galeri saat halaman pertama kali dibuka
     loadMedia();

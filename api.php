@@ -185,6 +185,10 @@ try {
             `kategori` VARCHAR(50)
         )");
 
+        // Otomatis tambahkan kolom baru jika belum ada di database
+        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `gender` VARCHAR(10) DEFAULT '-' AFTER `whatsapp`");
+        $conn->query("ALTER TABLE `data_donatur` ADD COLUMN `program` VARCHAR(255) DEFAULT '-' AFTER `gender`");
+
         // Batasi tampilan 100 terakhir agar browser tidak berat, tapi ringkasan (summary) baca semua
         $res = $conn->query("SELECT * FROM data_donatur ORDER BY id DESC LIMIT 100");
         $donaturs = [];

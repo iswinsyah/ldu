@@ -24,7 +24,7 @@
                 <i class="fas fa-chart-pie w-5"></i> Dashboard
             </a>
             <a href="#" id="nav-donatur" onclick="switchTab('donatur')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
-                <i class="fas fa-users w-5"></i> Data Donatur
+                <i class="fas fa-hand-holding-heart w-5"></i> Donasi
             </a>
             <a href="#" id="nav-ai1" onclick="switchTab('ai1')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-green-300 hover:bg-green-800 hover:text-white transition cursor-pointer">
                 <i class="fas fa-brain w-5"></i> AI 1 Analis Data
@@ -198,9 +198,9 @@
                 </div>
             </div>
 
-            <!-- Data Donatur -->
+            <!-- Data Donasi -->
             <div id="section-donatur" class="hidden">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Data Donatur (RFM Analysis)</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Data Donasi (RFM Analysis)</h2>
                 
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
@@ -248,15 +248,17 @@
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                    <th class="px-4 py-3">No</th>
+                                    <th class="px-6 py-3">Nomor Whatsapp</th>
                                     <th class="px-6 py-3">Nama</th>
-                                    <th class="px-6 py-3">WhatsApp</th>
-                                    <th class="px-6 py-3">Total Donasi</th>
-                                    <th class="px-6 py-3">Frekuensi</th>
-                                    <th class="px-6 py-3">Kategori RFM</th>
+                                    <th class="px-4 py-3">L / P</th>
+                                    <th class="px-6 py-3">Tgl Donasi</th>
+                                    <th class="px-6 py-3">Jumlah Donasi</th>
+                                    <th class="px-6 py-3">Program</th>
                                 </tr>
                             </thead>
                             <tbody id="donatur-table-body">
-                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Memuat data donatur...</td></tr>
+                                <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Memuat data donasi...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -521,7 +523,7 @@
         // Ubah Judul Header
         const headerTitle = document.getElementById('header-title');
         if (tabName === 'dashboard') { headerTitle.innerText = "Dashboard Statistik"; loadDashboard(); }
-        if (tabName === 'donatur') { headerTitle.innerText = "Data Donatur"; loadDonatur(); }
+        if (tabName === 'donatur') { headerTitle.innerText = "Data Donasi"; loadDonatur(); }
         if (tabName === 'ai1') headerTitle.innerText = "AI 1 Analis Data";
         if (tabName === 'ai2') headerTitle.innerText = "AI 2 Generator Program";
         if (tabName === 'program') { headerTitle.innerText = "Program Donasi"; loadProgram(); }
@@ -654,23 +656,24 @@
 
                 const tbody = document.getElementById('donatur-table-body');
                 if (result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data donatur. Silakan import dari CSV.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Belum ada data donasi. Silakan import dari CSV.</td></tr>';
                 } else {
                     tbody.innerHTML = '';
-                    result.data.forEach(d => {
-                        let badgeClass = 'bg-gray-100 text-gray-700';
-                        if (d.kategori === 'Besar Rutin') badgeClass = 'bg-green-100 text-green-700 border border-green-200 font-bold';
-                        else if (d.kategori === 'Besar Jarang') badgeClass = 'bg-blue-100 text-blue-700';
-                        else if (d.kategori === 'Kecil Rutin') badgeClass = 'bg-yellow-100 text-yellow-700';
-                        else if (d.kategori === 'Kecil Jarang') badgeClass = 'bg-red-100 text-red-700';
+                    result.data.forEach((d, index) => {
+                        let no = index + 1;
+                        let gender = d.gender || '-';
+                        let tgl = d.waktu ? new Date(d.waktu.replace(" ", "T")).toLocaleDateString('id-ID') : '-';
+                        let program = d.program || '-';
                         
                         tbody.innerHTML += `
                             <tr class="border-b border-gray-50 hover:bg-gray-50">
-                                <td class="px-6 py-4 font-medium text-gray-800">${d.nama}</td>
+                                <td class="px-4 py-4 text-gray-500">${no}</td>
                                 <td class="px-6 py-4">${d.whatsapp}</td>
-                                <td class="px-6 py-4">Rp ${Number(d.total_donasi).toLocaleString('id-ID')}</td>
-                                <td class="px-6 py-4">${d.frekuensi_donasi}x</td>
-                                <td class="px-6 py-4"><span class="${badgeClass} px-2 py-1 rounded text-xs">${d.kategori}</span></td>
+                                <td class="px-6 py-4 font-medium text-gray-800">${d.nama}</td>
+                                <td class="px-4 py-4">${gender}</td>
+                                <td class="px-6 py-4 text-gray-500">${tgl}</td>
+                                <td class="px-6 py-4 font-bold text-green-600">Rp ${Number(d.total_donasi).toLocaleString('id-ID')}</td>
+                                <td class="px-6 py-4 text-gray-600 truncate max-w-xs" title="${program}">${program}</td>
                             </tr>`;
                     });
                 }

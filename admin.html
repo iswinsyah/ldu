@@ -246,11 +246,15 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-800">Daftar Donatur (100 Terbaru)</h3>
+                        <button id="btn-delete-bulk-donatur" class="hidden bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm font-medium transition shadow-sm">
+                            <i class="fas fa-trash-alt mr-1"></i> Hapus Terpilih (<span id="count-selected">0</span>)
+                        </button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                    <th class="px-4 py-3"><input type="checkbox" id="selectAllDonatur" class="rounded border-gray-300 cursor-pointer"></th>
                                     <th class="px-4 py-3">No</th>
                                     <th class="px-6 py-3">Nomor Whatsapp</th>
                                     <th class="px-6 py-3">Nama</th>
@@ -263,7 +267,7 @@
                                 </tr>
                             </thead>
                             <tbody id="donatur-table-body">
-                                <tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">Memuat data donasi...</td></tr>
+                                <tr><td colspan="10" class="px-6 py-4 text-center text-gray-500">Memuat data donasi...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -659,9 +663,13 @@
                 document.getElementById('rfm-bj').innerText = result.summary.besar_jarang;
                 document.getElementById('rfm-br').innerText = result.summary.besar_rutin;
 
+                // Reset status centang masal saat data baru dimuat
+                document.getElementById('selectAllDonatur').checked = false;
+                document.getElementById('btn-delete-bulk-donatur').classList.add('hidden');
+
                 const tbody = document.getElementById('donatur-table-body');
                 if (result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">Belum ada data donasi. Silakan import dari CSV.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="px-6 py-4 text-center text-gray-500">Belum ada data donasi. Silakan import dari CSV.</td></tr>';
                 } else {
                     tbody.innerHTML = '';
                     result.data.forEach((d, index) => {
@@ -673,6 +681,7 @@
                         
                         tbody.innerHTML += `
                             <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                <td class="px-4 py-4"><input type="checkbox" class="cb-donatur rounded border-gray-300 cursor-pointer" value="${d.id}" onchange="toggleBulkButton()"></td>
                                 <td class="px-4 py-4 text-gray-500">${no}</td>
                                 <td class="px-6 py-4">${d.whatsapp}</td>
                                 <td class="px-6 py-4 font-medium text-gray-800">${d.nama}</td>
@@ -744,6 +753,43 @@
             } catch (err) { alert("Error: " + err.message); }
         }
     }
+
+    // ==========================================
+    // FUNGSI HAPUS MASAL (BULK DELETE)
+    // ==========================================
+    document.getElementById('selectAllDonatur').addEventListener('change', function() {
+        const isChecked = this.checked;
+        document.querySelectorAll('.cb-donatur').forEach(cb => cb.checked = isChecked);
+        toggleBulkButton();
+    });
+
+    function toggleBulkButton() {
+        const checkedCount = document.querySelectorAll('.cb-donatur:checked').length;
+        const btnBulk = document.getElementById('btn-delete-bulk-donatur');
+        if(checkedCount > 0) {
+            btnBulk.classList.remove('hidden');
+            document.getElementById('count-selected').innerText = checkedCount;
+        } else {
+            btnBulk.classList.add('hidden');
+            document.getElementById('selectAllDonatur').checked = false;
+        }
+    }
+
+    document.getElementById('btn-delete-bulk-donatur').addEventListener('click', async function() {
+        const checkedBoxes = document.querySelectorAll('.cb-donatur:checked');
+        if(checkedBoxes.length === 0) return;
+        
+        if(confirm(`Yakin ingin menghapus ${checkedBoxes.length} data terpilih secara permanen?`)) {
+            const ids = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+            const btn = this; const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...';
+            try {
+                const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'delete_donatur_bulk', ids: ids }) });
+                const result = await response.json();
+                if (result.status === 'success') { alert(result.message); loadDonatur(); } else { alert("Gagal: " + result.message); }
+            } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerHTML = originalText; }
+        }
+    });
 
     // ==========================================
     // FUNGSI MANAJEMEN PROGRAM

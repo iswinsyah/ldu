@@ -285,6 +285,27 @@ try {
     }
 
     // =======================================================
+    // 4.4d JALUR KHUSUS: HAPUS DATA DONASI MASAL (BULK)
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'delete_donatur_bulk') {
+        $ids = $data['ids'] ?? [];
+        if (!is_array($ids) || empty($ids)) {
+            die(json_encode(["status" => "error", "message" => "Tidak ada data yang dipilih."]));
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $types = str_repeat('i', count($ids));
+        
+        $stmt = $conn->prepare("DELETE FROM data_donatur WHERE id IN ($placeholders)");
+        $stmt->bind_param($types, ...$ids);
+        if ($stmt->execute()) {
+            die(json_encode(["status" => "success", "message" => count($ids) . " data donasi berhasil dihapus!"]));
+        } else {
+            die(json_encode(["status" => "error", "message" => "Gagal menghapus data masal: " . $stmt->error]));
+        }
+    }
+
+    // =======================================================
     // 4.5 JALUR KHUSUS: AI AGENT (GEMINI API VIA PHP)
     // =======================================================
     if (isset($data['action']) && $data['action'] === 'call_ai') {

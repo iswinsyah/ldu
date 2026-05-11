@@ -253,12 +253,13 @@
                                     <th class="px-6 py-3">Nama</th>
                                     <th class="px-4 py-3">L / P</th>
                                     <th class="px-6 py-3">Tgl Donasi</th>
+                                    <th class="px-4 py-3">Hari</th>
                                     <th class="px-6 py-3">Jumlah Donasi</th>
                                     <th class="px-6 py-3">Program</th>
                                 </tr>
                             </thead>
                             <tbody id="donatur-table-body">
-                                <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Memuat data donasi...</td></tr>
+                                <tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">Memuat data donasi...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -656,13 +657,14 @@
 
                 const tbody = document.getElementById('donatur-table-body');
                 if (result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Belum ada data donasi. Silakan import dari CSV.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">Belum ada data donasi. Silakan import dari CSV.</td></tr>';
                 } else {
                     tbody.innerHTML = '';
                     result.data.forEach((d, index) => {
                         let no = index + 1;
                         let gender = d.gender || '-';
                         let tgl = d.waktu ? new Date(d.waktu.replace(" ", "T")).toLocaleDateString('id-ID') : '-';
+                        let hari = d.waktu ? new Date(d.waktu.replace(" ", "T")).toLocaleDateString('id-ID', { weekday: 'long' }) : '-';
                         let program = d.program || '-';
                         
                         tbody.innerHTML += `
@@ -672,6 +674,7 @@
                                 <td class="px-6 py-4 font-medium text-gray-800">${d.nama}</td>
                                 <td class="px-4 py-4">${gender}</td>
                                 <td class="px-6 py-4 text-gray-500">${tgl}</td>
+                                <td class="px-4 py-4 text-gray-500 capitalize">${hari}</td>
                                 <td class="px-6 py-4 font-bold text-green-600">Rp ${Number(d.total_donasi).toLocaleString('id-ID')}</td>
                                 <td class="px-6 py-4 text-gray-600 truncate max-w-xs" title="${program}">${program}</td>
                             </tr>`;
@@ -792,6 +795,11 @@
         }
     }
 
+    // Panggil dashboard saat halaman pertama kali dibuka
+    switchTab('dashboard');
+    </script>
+</body>
+</html>
     // Panggil dashboard saat halaman pertama kali dibuka
     switchTab('dashboard');
     </script>

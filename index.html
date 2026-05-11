@@ -22,18 +22,50 @@
                     }
                 } catch(e) {}
 
+                // Deteksi Browser
+                let browser = 'Lainnya';
+                if (navigator.userAgent.indexOf("Chrome") != -1) browser = "Chrome";
+                else if (navigator.userAgent.indexOf("Safari") != -1) browser = "Safari";
+                else if (navigator.userAgent.indexOf("Firefox") != -1) browser = "Firefox";
+                else if (navigator.userAgent.indexOf("MSIE") != -1 || !!document.documentMode == true) browser = "IE";
+
+                // Deteksi OS
+                let os = 'Lainnya';
+                if (navigator.appVersion.indexOf("Win") != -1) os = "Windows";
+                else if (navigator.appVersion.indexOf("Mac") != -1) os = "MacOS";
+                else if (navigator.appVersion.indexOf("X11") != -1) os = "UNIX";
+                else if (navigator.appVersion.indexOf("Linux") != -1) os = "Linux";
+                if (navigator.userAgent.match(/Android/i)) os = "Android";
+                if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) os = "iOS";
+
+                let device = /Mobile|Android|iP(hone|od|ad)/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
+                
+                // Tangkap Keyword dari URL (misal dari Iklan Ads atau Pencarian)
+                const urlParams = new URLSearchParams(window.location.search);
+                let keyword = urlParams.get('utm_term') || urlParams.get('q') || urlParams.get('keyword') || '';
+                
+                let referrer = document.referrer || 'Langsung (Direct)';
+                if(referrer !== 'Langsung (Direct)') {
+                    try { referrer = new URL(referrer).hostname; } catch(e) {}
+                }
+
                 const trackData = {
-                    type: 'tracking',
-                    page: window.location.pathname || 'Home',
-                    referrer: document.referrer || 'Direct',
-                    userAgent: navigator.userAgent,
+                    token: 'LduBerkah999!',
+                    action: 'track_visitor',
+                    halaman: window.location.pathname || 'Home',
+                    sumber: referrer,
+                    browser: browser,
+                    os: os,
+                    perangkat: device,
+                    keyword: keyword,
                     ip: ip,
                     city: city,
                     country: country
                 };
 
-                const backendEndpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";
-                fetch(backendEndpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(trackData) });
+                // Tembak langsung ke Hostinger
+                const backendEndpoint = "api.php";
+                fetch(backendEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(trackData) });
             } catch(err) {}
         })();
     </script>

@@ -6,6 +6,8 @@
     <title>Admin Minimalis LDU</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Tambahkan library pembuat Grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
 
@@ -53,12 +55,74 @@
 
         <div class="flex-1 overflow-x-hidden overflow-y-auto p-6 bg-gray-50">
             
-            <!-- Dashboard Placeholder -->
-            <div id="section-dashboard" class="hidden">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Dashboard</h2>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 text-gray-500 text-center py-12">
-                    <i class="fas fa-tools text-4xl mb-3 opacity-50"></i>
-                    <p>Menu ini akan segera kita bangun.</p>
+            <!-- Dashboard Statistik -->
+            <div id="section-dashboard" class="block">
+                <div class="mb-6 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Statistik Pengunjung (Mata LDU)</h2>
+                    <button onclick="loadDashboard()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow"><i class="fas fa-sync-alt mr-2"></i> Refresh</button>
+                </div>
+                
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Kunjungan Harian</p>
+                        <h3 id="stat-harian" class="text-2xl font-bold text-gray-800">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Pekanan</p>
+                        <h3 id="stat-pekanan" class="text-2xl font-bold text-gray-800">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Bulanan</p>
+                        <h3 id="stat-bulanan" class="text-2xl font-bold text-gray-800">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Tahunan</p>
+                        <h3 id="stat-tahunan" class="text-2xl font-bold text-gray-800">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Total Kunjungan</p>
+                        <h3 id="stat-total" class="text-2xl font-bold text-green-600">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Total IP Unik</p>
+                        <h3 id="stat-ip" class="text-2xl font-bold text-blue-600">...</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-80">
+                        <h4 class="text-sm font-bold text-gray-600 mb-4 text-center">Tren Kunjungan (7 Hari Terakhir)</h4>
+                        <div class="h-64"><canvas id="trafficChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-80">
+                        <h4 class="text-sm font-bold text-gray-600 mb-4 text-center">Sumber Trafik</h4>
+                        <div class="h-64"><canvas id="sourceChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64">
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Browser</h4>
+                        <div class="h-48"><canvas id="browserChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64">
+                        <h4 class="text-sm font-bold text-gray-600 mb-2 text-center">Sistem Operasi (OS)</h4>
+                        <div class="h-48"><canvas id="osChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h4 class="text-sm font-bold text-gray-600 mb-4 border-b pb-2">Top Keyword Pencarian</h4>
+                        <ul id="list-keyword" class="space-y-2 text-sm text-gray-600">
+                            <li>Memuat...</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h4 class="text-sm font-bold text-gray-600 mb-4 border-b pb-2">Asal Pengunjung (Kota Teratas)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="list-kota">
+                        <div>Memuat...</div>
+                    </div>
                 </div>
             </div>
 
@@ -72,7 +136,7 @@
             </div>
 
             <!-- Media Section (Aktif) -->
-            <div id="section-media" class="block">
+            <div id="section-media" class="hidden">
                 <!-- Kotak Upload -->
                 <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-200">
                     <h2 class="text-lg font-bold mb-4 border-b pb-2"><i class="fas fa-upload text-blue-500 mr-2"></i> Tes Upload Gambar</h2>
@@ -102,6 +166,50 @@
         // ==========================================
         const HOSTINGER_API = "api.php"; 
         const HOSTINGER_TOKEN = "LduBerkah999!"; 
+
+        // ==========================================
+        // FUNGSI LOAD DASHBOARD STATISTIK
+        // ==========================================
+        let trafficChartInst = null; let sourceChartInst = null; let browserChartInst = null; let osChartInst = null;
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'get_stats' }) });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const d = result.data;
+                    document.getElementById('stat-harian').innerText = d.kunjungan.harian || 0;
+                    document.getElementById('stat-pekanan').innerText = d.kunjungan.pekanan || 0;
+                    document.getElementById('stat-bulanan').innerText = d.kunjungan.bulanan || 0;
+                    document.getElementById('stat-tahunan').innerText = d.kunjungan.tahunan || 0;
+                    document.getElementById('stat-total').innerText = d.kunjungan.total || 0;
+                    document.getElementById('stat-ip').innerText = d.ip_unik || 0;
+
+                    const colors = ['#10B981', '#3B82F6', '#F59E0B', '#F43F5E', '#8B5CF6'];
+                    const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } };
+
+                    if (trafficChartInst) trafficChartInst.destroy();
+                    trafficChartInst = new Chart(document.getElementById('trafficChart'), { type: 'line', data: {
+                        labels: d.chart_traffic.labels, datasets: [{ label: 'Kunjungan', data: d.chart_traffic.data, borderColor: '#059669', backgroundColor: 'rgba(5, 150, 105, 0.1)', borderWidth: 2, fill: true, tension: 0.3 }]
+                    }, options: { responsive: true, maintainAspectRatio: false }});
+
+                    if (sourceChartInst) sourceChartInst.destroy();
+                    sourceChartInst = new Chart(document.getElementById('sourceChart'), { type: 'bar', data: {
+                        labels: d.chart_sumber.labels, datasets: [{ label: 'Jumlah', data: d.chart_sumber.data, backgroundColor: colors }]
+                    }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }});
+
+                    if (browserChartInst) browserChartInst.destroy();
+                    browserChartInst = new Chart(document.getElementById('browserChart'), { type: 'doughnut', data: { labels: d.chart_browser.labels, datasets: [{ data: d.chart_browser.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
+
+                    if (osChartInst) osChartInst.destroy();
+                    osChartInst = new Chart(document.getElementById('osChart'), { type: 'doughnut', data: { labels: d.chart_os.labels, datasets: [{ data: d.chart_os.data, backgroundColor: colors, borderWidth: 0 }] }, options: chartOpts });
+
+                    document.getElementById('list-keyword').innerHTML = d.keyword.length ? d.keyword.map(k => `<li class="flex justify-between border-b border-gray-50 pb-1"><span>${k.keyword}</span><span class="font-bold">${k.jml}</span></li>`).join('') : '<li class="text-gray-400 italic text-center">Belum ada data keyword</li>';
+                    document.getElementById('list-kota').innerHTML = d.asal_kota.length ? d.asal_kota.map(k => `<div class="bg-gray-50 p-2 rounded flex justify-between border border-gray-100"><span class="font-medium">${k.kota || 'Unknown'}</span><span class="bg-green-100 text-green-700 px-2 rounded-full text-xs flex items-center">${k.jml} kunjungan</span></div>`).join('') : '<div class="text-gray-400 italic col-span-full text-center">Belum ada data lokasi</div>';
+                }
+            } catch (err) { console.error("Gagal load dashboard", err); }
+        }
 
         // FUNGSI MEMUAT GAMBAR
         async function loadMedia() {
@@ -214,13 +322,13 @@
 
         // Ubah Judul Header
         const headerTitle = document.getElementById('header-title');
-        if (tabName === 'dashboard') headerTitle.innerText = "Overview";
+        if (tabName === 'dashboard') { headerTitle.innerText = "Dashboard Statistik"; loadDashboard(); }
         if (tabName === 'program') headerTitle.innerText = "Program";
         if (tabName === 'media') { headerTitle.innerText = "Media & Gambar"; loadMedia(); }
     }
 
-    // Panggil galeri saat halaman pertama kali dibuka
-    loadMedia();
+    // Panggil dashboard saat halaman pertama kali dibuka
+    switchTab('dashboard');
     </script>
 </body>
 </html>

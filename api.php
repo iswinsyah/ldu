@@ -97,6 +97,78 @@ try {
         }
     }
 
+    // =======================================================
+    // 4.1 JALUR KHUSUS: TRACKING VISITOR (MATA LDU)
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'track_visitor') {
+        // Otomatis buat tabel jika belum ada
+        $conn->query("CREATE TABLE IF NOT EXISTS `data_trafik` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `waktu` DATETIME,
+            `halaman` VARCHAR(255),
+            `ip` VARCHAR(100),
+            `kota` VARCHAR(100),
+            `negara` VARCHAR(100),
+            `browser` VARCHAR(100),
+            `os` VARCHAR(100),
+            `perangkat` VARCHAR(100),
+            `sumber` VARCHAR(255),
+            `keyword` VARCHAR(255)
+        )");
+
+        $stmt = $conn->prepare("INSERT INTO data_trafik (waktu, halaman, ip, kota, negara, browser, os, perangkat, sumber, keyword) VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt) {
+            $h = $data['halaman'] ?? ''; $i = $data['ip'] ?? ''; $k = $data['kota'] ?? ''; $n = $data['negara'] ?? '';
+            $b = $data['browser'] ?? ''; $o = $data['os'] ?? ''; $p = $data['perangkat'] ?? ''; 
+            $s = $data['sumber'] ?? ''; $kw = $data['keyword'] ?? '';
+            
+            $stmt->bind_param("sssssssss", $h, $i, $k, $n, $b, $o, $p, $s, $kw);
+            $stmt->execute();
+            $stmt->close();
+        }
+        die(json_encode(["status" => "success"]));
+    }
+
+    // =======================================================
+    // 4.2 JALUR KHUSUS: DASHBOARD STATISTIK
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'get_stats') {
+        $stats = [];
+        
+        // 1 & 2. Data Kunjungan dan IP Unik
+        $stats['kunjungan']['harian'] = $conn->query("SELECT COUNT(*) FROM data_trafik WHERE DATE(waktu) = CURDATE()")->fetch_row()[0] ?? 0;
+        $stats['kunjungan']['pekanan'] = $conn->query("SELECT COUNT(*) FROM data_trafik WHERE YEARWEEK(waktu, 1) = YEARWEEK(CURDATE(), 1)")->fetch_row()[0] ?? 0;
+        $stats['kunjungan']['bulanan'] = $conn->query("SELECT COUNT(*) FROM data_trafik WHERE MONTH(waktu) = MONTH(CURDATE()) AND YEAR(waktu) = YEAR(CURDATE())")->fetch_row()[0] ?? 0;
+        $stats['kunjungan']['tahunan'] = $conn->query("SELECT COUNT(*) FROM data_trafik WHERE YEAR(waktu) = YEAR(CURDATE())")->fetch_row()[0] ?? 0;
+        $stats['kunjungan']['total'] = $conn->query("SELECT COUNT(*) FROM data_trafik")->fetch_row()[0] ?? 0;
+        $stats['ip_unik'] = $conn->query("SELECT COUNT(DISTINCT ip) FROM data_trafik")->fetch_row()[0] ?? 0;
+        
+        // Chart Tren Kunjungan Harian (7 Hari Terakhir)
+        $res = $conn->query("SELECT DATE(waktu) as tgl, COUNT(*) as jml FROM data_trafik WHERE waktu >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(waktu) ORDER BY tgl ASC");
+        $labels = []; $counts = []; if ($res) { while($r = $res->fetch_assoc()) { $labels[] = $r['tgl']; $counts[] = $r['jml']; } }
+        $stats['chart_traffic'] = ['labels' => $labels, 'data' => $counts];
+        
+        // 3. Asal Pengunjung (Kota)
+        $res = $conn->query("SELECT kota, COUNT(*) as jml FROM data_trafik GROUP BY kota ORDER BY jml DESC LIMIT 6");
+        $kota = []; if($res) { while($r = $res->fetch_assoc()) { $kota[] = $r; } }
+        $stats['asal_kota'] = $kota;
+        
+        // 4 & 5 & 6. Browser, OS, dan Sumber Trafik
+        $res = $conn->query("SELECT browser, COUNT(*) as jml FROM data_trafik GROUP BY browser");
+        $l = []; $d = []; if($res) { while($r = $res->fetch_assoc()) { $l[] = $r['browser']; $d[] = $r['jml']; } } $stats['chart_browser'] = ['labels' => $l, 'data' => $d];
+        $res = $conn->query("SELECT os, COUNT(*) as jml FROM data_trafik GROUP BY os");
+        $l = []; $d = []; if($res) { while($r = $res->fetch_assoc()) { $l[] = $r['os']; $d[] = $r['jml']; } } $stats['chart_os'] = ['labels' => $l, 'data' => $d];
+        $res = $conn->query("SELECT sumber, COUNT(*) as jml FROM data_trafik GROUP BY sumber ORDER BY jml DESC LIMIT 5");
+        $l = []; $d = []; if($res) { while($r = $res->fetch_assoc()) { $l[] = $r['sumber']; $d[] = $r['jml']; } } $stats['chart_sumber'] = ['labels' => $l, 'data' => $d];
+        
+        // 7. Keyword
+        $res = $conn->query("SELECT keyword, COUNT(*) as jml FROM data_trafik WHERE keyword != '' AND keyword IS NOT NULL GROUP BY keyword ORDER BY jml DESC LIMIT 5");
+        $kw = []; if($res) { while($r = $res->fetch_assoc()) { $kw[] = $r; } }
+        $stats['keyword'] = $kw;
+        
+        die(json_encode(["status" => "success", "data" => $stats]));
+    }
+
     // 5. JALUR KHUSUS: EKSEKUSI SQL DARI GOOGLE APPS SCRIPT
     $sql = isset($data['sql_base64']) ? base64_decode($data['sql_base64']) : ($data['sql'] ?? '');
     $params = $data['params'] ?? [];

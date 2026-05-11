@@ -368,6 +368,58 @@
                 </div>
             </div>
 
+        <!-- Modal Edit Donatur -->
+        <div id="modal-edit-donatur" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800">Edit Data Donatur</h3>
+                    <button onclick="closeEditDonatur()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <input type="hidden" id="edit-donatur-id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Donatur</label>
+                        <input type="text" id="edit-donatur-nama" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
+                            <input type="text" id="edit-donatur-wa" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">L / P</label>
+                            <select id="edit-donatur-gender" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                                <option value="-">-</option><option value="L">L</option><option value="P">P</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal (YYYY-MM-DD HH:MM:SS)</label>
+                            <input type="text" id="edit-donatur-waktu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Donasi (Rp)</label>
+                            <input type="number" id="edit-donatur-jumlah" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Frekuensi</label>
+                            <input type="number" id="edit-donatur-frek" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Program</label>
+                            <input type="text" id="edit-donatur-program" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+                    <button onclick="closeEditDonatur()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition">Batal</button>
+                    <button id="btn-save-edit-donatur" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
         </div>
     </main>
 
@@ -663,6 +715,7 @@
     // FUNGSI DATA DONATUR (LOAD & IMPORT)
     // ==========================================
     let currentDonaturPage = 1;
+    let currentDonaturData = [];
     async function loadDonatur(page = 1) {
         try {
             currentDonaturPage = page;
@@ -671,6 +724,7 @@
             const result = await response.json();
             
             if (result.status === 'success') {
+                currentDonaturData = result.data;
                 document.getElementById('rfm-total').innerText = result.summary.total;
                 document.getElementById('rfm-kj').innerText = result.summary.kecil_jarang;
                 document.getElementById('rfm-kr').innerText = result.summary.kecil_rutin;
@@ -717,6 +771,7 @@
                                 <td class="px-6 py-4 font-bold text-green-600">Rp ${Number(d.total_donasi).toLocaleString('id-ID')}</td>
                                 <td class="px-6 py-4 text-gray-600 truncate max-w-xs" title="${program}">${program}</td>
                                 <td class="px-6 py-4 text-right">
+                                    <button onclick="editDonatur(${d.id})" class="text-blue-500 hover:text-blue-700 mr-3" title="Edit"><i class="fas fa-edit"></i></button>
                                     <button onclick="deleteDonatur(${d.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>`;
@@ -781,6 +836,48 @@
             } else { alert("Gagal import: " + result.message); }
         } catch (error) { alert("Error import: " + error.message); } 
         finally { btn.disabled = false; btn.innerHTML = originalText; }
+    });
+
+    function editDonatur(id) {
+        const d = currentDonaturData.find(x => x.id == id);
+        if(d) {
+            document.getElementById('edit-donatur-id').value = d.id;
+            document.getElementById('edit-donatur-nama').value = d.nama;
+            document.getElementById('edit-donatur-wa').value = d.whatsapp;
+            document.getElementById('edit-donatur-gender').value = d.gender;
+            document.getElementById('edit-donatur-waktu').value = d.waktu;
+            document.getElementById('edit-donatur-jumlah').value = d.total_donasi;
+            document.getElementById('edit-donatur-frek').value = d.frekuensi_donasi;
+            document.getElementById('edit-donatur-program').value = d.program;
+            
+            document.getElementById('modal-edit-donatur').classList.remove('hidden');
+        }
+    }
+
+    function closeEditDonatur() { document.getElementById('modal-edit-donatur').classList.add('hidden'); }
+
+    document.getElementById('btn-save-edit-donatur').addEventListener('click', async function() {
+        const btn = this; const originalText = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
+        
+        const payload = {
+            token: HOSTINGER_TOKEN, action: 'edit_donatur',
+            id: document.getElementById('edit-donatur-id').value,
+            nama: document.getElementById('edit-donatur-nama').value,
+            whatsapp: document.getElementById('edit-donatur-wa').value,
+            gender: document.getElementById('edit-donatur-gender').value,
+            waktu: document.getElementById('edit-donatur-waktu').value,
+            jumlah: document.getElementById('edit-donatur-jumlah').value,
+            frek: document.getElementById('edit-donatur-frek').value,
+            program: document.getElementById('edit-donatur-program').value
+        };
+        
+        try {
+            const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            const result = await response.json();
+            if (result.status === 'success') { alert(result.message); closeEditDonatur(); loadDonatur(currentDonaturPage); } 
+            else { alert("Gagal: " + result.message); }
+        } catch (error) { alert("Error: " + error.message); } finally { btn.disabled = false; btn.innerHTML = originalText; }
     });
 
     // ==========================================

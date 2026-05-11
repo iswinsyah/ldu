@@ -264,14 +264,13 @@ try {
             if ($headers) {
                 foreach ($headers as $i => $h) {
                     $hl = preg_replace('/[^a-z0-9]/i', '', strtolower($h));
-                    // Use strpos for broader matching (e.g., "nama donatur", "whatsapp nomor")
-                    if (strpos($hl, 'nama') !== false) { $c_nama = $i; }
-                    elseif (strpos($hl, 'wa') !== false || strpos($hl, 'whatsapp') !== false) { $c_wa = $i; }
-                    elseif (strpos($hl, 'gender') !== false || strpos($hl, 'jk') !== false || strpos($hl, 'lp') !== false) { $c_gender = $i; }
+                    if (strpos($hl, 'wa') !== false || strpos($hl, 'whatsapp') !== false) { $c_wa = $i; }
+                    elseif (strpos($hl, 'nama') !== false) { $c_nama = $i; }
+                    elseif (strpos($hl, 'gender') !== false || strpos($hl, 'jk') !== false || $hl === 'lp') { $c_gender = $i; }
                     elseif (strpos($hl, 'tgl') !== false || strpos($hl, 'tanggal') !== false) { $c_tgl = $i; }
-                    elseif (strpos($hl, 'jumlah') !== false || strpos($hl, 'donasi') !== false || strpos($hl, 'nominal') !== false) { $c_jumlah = $i; }
                     elseif (strpos($hl, 'frek') !== false || strpos($hl, 'frekuensi') !== false) { $c_frek = $i; }
                     elseif (strpos($hl, 'program') !== false || strpos($hl, 'campaign') !== false) { $c_prog = $i; }
+                    elseif (strpos($hl, 'jumlah') !== false || strpos($hl, 'nominal') !== false || $hl === 'donasi') { $c_jumlah = $i; }
                 }
             }
 
@@ -301,12 +300,41 @@ try {
 
                 $gender = ($c_gender !== -1 && isset($row[$c_gender])) ? trim($row[$c_gender]) : '-';
                 
-                $raw_waktu = ($c_tgl !== -1 && isset($row[$c_tgl])) ? str_replace('/', '-', trim($row[$c_tgl])) : '';
-                $indo_months = ['januari'=>'jan', 'februari'=>'feb', 'maret'=>'mar', 'april'=>'apr', 'mei'=>'may', 'juni'=>'jun', 'juli'=>'jul', 'agustus'=>'aug', 'september'=>'sep', 'oktober'=>'oct', 'november'=>'nov', 'desember'=>'dec'];
-                $en_waktu = str_ireplace(array_keys($indo_months), array_values($indo_months), str_replace('/', '-', $raw_waktu));
-                $waktu = (!empty(trim($en_waktu)) && strtotime($en_waktu)) ? date('Y-m-d H:i:s', strtotime($en_waktu)) : date('Y-m-d H:i:s');
+                // JURUS PARSING TANGGAL SUPER SAKTI
+                $raw_waktu = ($c_tgl !== -1 && isset($row[$c_tgl])) ? trim($row[$c_tgl]) : '';
+                $waktu = date('Y-m-d H:i:s');
+                if (!empty($raw_waktu)) {
+                    $clean_waktu = preg_replace('/[^0-9a-zA-Z\s\-\/\.]/', '', $raw_waktu);
+                    $indo_months = ['januari'=>'01', 'jan'=>'01', 'februari'=>'02', 'feb'=>'02', 'maret'=>'03', 'mar'=>'03', 'april'=>'04', 'apr'=>'04', 'mei'=>'05', 'may'=>'05', 'juni'=>'06', 'jun'=>'06', 'juli'=>'07', 'jul'=>'07', 'agustus'=>'08', 'agu'=>'08', 'aug'=>'08', 'september'=>'09', 'sep'=>'09', 'oktober'=>'10', 'okt'=>'10', 'oct'=>'10', 'november'=>'11', 'nov'=>'11', 'desember'=>'12', 'des'=>'12', 'dec'=>'12'];
+                    foreach($indo_months as $id => $en) {
+                        if(stripos($clean_waktu, $id) !== false) {
+                            $clean_waktu = str_ireplace($id, "-$en-", $clean_waktu);
+                        }
+                    }
+                    $clean_waktu = trim(preg_replace('/-+/', '-', preg_replace('/[\s\/\.]+/', '-', $clean_waktu)), '-');
+                    $parts = explode('-', $clean_waktu);
+                    if (count($parts) >= 3) {
+                        $p1 = intval($parts[0]); $p2 = intval($parts[1]); $p3 = intval($parts[2]);
+                        $year = $month = $day = 0;
+                        if ($p1 > 1000) { $year = $p1; $month = $p2; $day = $p3; }
+                        else if ($p3 > 1000) { $year = $p3; $month = $p2; $day = $p1; }
+                        else if ($p3 >= 0 && $p3 < 100) { $year = 2000 + $p3; $month = $p2; $day = $p1; }
+                        if ($month > 12 && $day <= 12) { $tmp = $month; $month = $day; $day = $tmp; }
+                        if ($year > 0 && $month > 0 && $month <= 12 && $day > 0 && $day <= 31) {
+                            $waktu = sprintf('%04d-%02d-%02d 00:00:00', $year, $month, $day);
+                        }
+                    }
+                }
                 
-                $total_donasi = ($c_jumlah !== -1 && isset($row[$c_jumlah])) ? floatval(preg_replace('/[^0-9]/', '', $row[$c_jumlah])) : 0;
+                // JURUS PARSING ANGKA ANTI BOCOR
+                $jumlah_str = ($c_jumlah !== -1 && isset($row[$c_jumlah])) ? trim($row[$c_jumlah]) : '0';
+                if (stripos($jumlah_str, 'E') !== false) { $total_donasi = floatval($jumlah_str); } 
+                else {
+                    $jumlah_str = preg_replace('/[^0-9,\.-]/', '', $jumlah_str);
+                    if (preg_match('/,\d{1,2}$/', $jumlah_str)) { $jumlah_str = preg_replace('/,\d{1,2}$/', '', $jumlah_str); }
+                    $total_donasi = floatval(preg_replace('/[^0-9]/', '', $jumlah_str));
+                }
+                
                 $frekuensi = ($c_frek !== -1 && isset($row[$c_frek])) ? intval(preg_replace('/[^0-9]/', '', $row[$c_frek])) : 1;
                 $frekuensi = $frekuensi <= 0 ? 1 : $frekuensi;
                 
@@ -433,6 +461,32 @@ try {
 
         // Response dari GAS sudah berformat JSON sukses/error siap pakai
         die($response);
+    }
+
+    // =======================================================
+    // 4.4f JALUR KHUSUS: EDIT DATA DONASI MANUAL
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'edit_donatur') {
+        $id = $data['id'] ?? '';
+        $nama = $data['nama'] ?? 'Hamba Allah';
+        if(empty(trim($nama))) $nama = 'Hamba Allah';
+        $whatsapp = $data['whatsapp'] ?? '';
+        $gender = $data['gender'] ?? '-';
+        $waktu = $data['waktu'] ?? date('Y-m-d H:i:s');
+        $total_donasi = floatval($data['jumlah'] ?? 0);
+        $frekuensi = intval($data['frek'] ?? 1);
+        $program = $data['program'] ?? '-';
+        
+        $kategori = "Kecil Jarang";
+        if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "Besar Rutin"; }
+        else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
+        else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "Kecil Rutin"; }
+        
+        $stmt = $conn->prepare("UPDATE data_donatur SET waktu=?, nama=?, whatsapp=?, gender=?, total_donasi=?, frekuensi_donasi=?, program=?, kategori=? WHERE id=?");
+        $stmt->bind_param("ssssdissi", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori, $id);
+        
+        if ($stmt->execute()) { die(json_encode(["status" => "success", "message" => "Mantap! Data donasi berhasil diperbarui!"])); } 
+        else { die(json_encode(["status" => "error", "message" => "Gagal memperbarui data: " . $stmt->error])); }
     }
 
     // =======================================================

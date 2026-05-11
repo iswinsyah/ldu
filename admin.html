@@ -407,11 +407,10 @@
                 }
             }
 
-            // 2. SAPU BERSIH SEMUA KARAKTER BERBAHAYA (Enter, Tab, Kutip, dll) AGAR AMAN DARI GOOGLE APPS SCRIPT
-            const cleanProgram = programType.replace(/[\r\n\t"'\\]/g, " ").trim();
-            const cleanStat = statText.replace(/[\r\n\t"'\\]/g, " ").trim();
-            
-            const promptTopic = `Tolong riset Buyer Persona detail untuk program donasi: ${cleanProgram}. Info data web LDU: ${cleanStat}. Buatkan struktur: 1.Demografi 2.Psikografi 3.Perilaku Digital 4.Angle Iklan.`;
+            // 2. KEMBALIKAN KE FORMAT PALING SEDERHANA (HANYA JUDUL PROGRAM)
+            // Pesan "Argumen tidak valid" terjadi jika Google Script menolak teks yang terlalu panjang.
+            // Kita kirim murni hanya judul programnya saja persis seperti format bawaan Google Script Bos.
+            const promptTopic = programType.trim();
 
             // 3. Panggil Agen AI via Google Apps Script Endpoint
             const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";

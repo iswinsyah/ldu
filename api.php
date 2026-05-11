@@ -245,8 +245,24 @@ try {
                 }
             }
 
-            // Buang baris pertama (Header Judul Kolom)
-            fgetcsv($handle, 0, $delimiter);
+            // JURUS MATA ELANG: Baca Header untuk mencari posisi kolom secara otomatis!
+            $headers = fgetcsv($handle, 0, $delimiter);
+            
+            // Urutan default jika tidak ketemu judulnya (0:No, 1:WA, 2:Nama, 3:L/P, 4:Tgl, 5:Jumlah, 6:Frek, 7:Program)
+            $c_wa = 1; $c_nama = 2; $c_gender = 3; $c_tgl = 4; $c_jumlah = 5; $c_frek = 6; $c_prog = 7;
+            
+            if ($headers) {
+                foreach ($headers as $i => $h) {
+                    $hl = strtolower(preg_replace('/[^a-z0-9]/i', '', $h)); // Bersihkan teks header
+                    if (strpos($hl, 'nama') !== false && strpos($hl, 'program') === false) { $c_nama = $i; }
+                    elseif (strpos($hl, 'wa') !== false || strpos($hl, 'whatsapp') !== false || strpos($hl, 'hp') !== false) { $c_wa = $i; }
+                    elseif (strpos($hl, 'lp') !== false || strpos($hl, 'kelamin') !== false || strpos($hl, 'gender') !== false) { $c_gender = $i; }
+                    elseif (strpos($hl, 'tgl') !== false || strpos($hl, 'tanggal') !== false || strpos($hl, 'waktu') !== false) { $c_tgl = $i; }
+                    elseif (strpos($hl, 'jumlah') !== false || strpos($hl, 'donasi') !== false || strpos($hl, 'nominal') !== false || strpos($hl, 'total') !== false) { $c_jumlah = $i; }
+                    elseif (strpos($hl, 'frek') !== false || strpos($hl, 'kali') !== false) { $c_frek = $i; }
+                    elseif (strpos($hl, 'program') !== false || strpos($hl, 'kampanye') !== false) { $c_prog = $i; }
+                }
+            }
 
             $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $count = 0;
@@ -256,22 +272,27 @@ try {
             while (($row = fgetcsv($handle, 0, $delimiter)) !== FALSE) {
                 if (empty(array_filter($row))) continue; // Lewati baris kosong
 
-                // Format Baru Excel: 0:No | 1:WhatsApp | 2:Nama | 3:L/P | 4:Tgl | 5:Jumlah | 6:Frekuensi | 7:Program
-                $whatsapp = isset($row[1]) ? trim($row[1]) : '';
-                $nama = isset($row[2]) ? trim($row[2]) : 'Hamba Allah';
+                // Ambil data sesuai dengan posisi kolom yang ditemukan Mata Elang
+                $whatsapp = isset($row[$c_wa]) ? trim($row[$c_wa]) : '';
+                $nama = isset($row[$c_nama]) ? trim($row[$c_nama]) : 'Hamba Allah';
                 if(empty(trim($nama))) $nama = 'Hamba Allah';
-                $gender = isset($row[3]) ? trim($row[3]) : '-';
+                $gender = isset($row[$c_gender]) ? trim($row[$c_gender]) : '-';
                 
                 // Terjemahkan nama bulan Indonesia ke Inggris agar PHP paham
-                $raw_waktu = isset($row[4]) ? str_replace('/', '-', trim($row[4])) : '';
+                $raw_waktu = isset($row[$c_tgl]) ? str_replace('/', '-', trim($row[$c_tgl])) : '';
                 $indo_months = ['januari'=>'jan', 'februari'=>'feb', 'maret'=>'mar', 'april'=>'apr', 'mei'=>'may', 'juni'=>'jun', 'juli'=>'jul', 'agustus'=>'aug', 'september'=>'sep', 'oktober'=>'oct', 'november'=>'nov', 'desember'=>'dec'];
                 $en_waktu = str_ireplace(array_keys($indo_months), array_values($indo_months), str_replace('/', '-', $raw_waktu));
                 $waktu = (!empty(trim($en_waktu)) && strtotime($en_waktu)) ? date('Y-m-d H:i:s', strtotime($en_waktu)) : date('Y-m-d H:i:s');
                 
-                $total_donasi = isset($row[5]) ? floatval(preg_replace('/[^0-9]/', '', $row[5])) : 0;
-                $frekuensi = isset($row[6]) ? intval($row[6]) : 1;
+                $total_donasi = isset($row[$c_jumlah]) ? floatval(preg_replace('/[^0-9]/', '', $row[$c_jumlah])) : 0;
+                $frekuensi = isset($row[$c_frek]) ? intval(preg_replace('/[^0-9]/', '', $row[$c_frek])) : 1;
                 $frekuensi = $frekuensi <= 0 ? 1 : $frekuensi; // Minimal 1 kali donasi
-                $program = isset($row[7]) ? trim($row[7]) : '-';
+                
+                $program = isset($row[$c_prog]) ? trim($row[$c_prog]) : '-';
+                // Bersihkan error Excel yang terbawa ke CSV (seperti #DIV/0! atau #VALUE!)
+                if (strpos($program, '#') === 0) {
+                    $program = '-';
+                }
                 
                 // AI Pelabelan RFM Otomatis
                 $kategori = "Kecil Jarang";

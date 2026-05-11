@@ -213,19 +213,34 @@ try {
         }
         
         $file = $_FILES['file_csv']['tmp_name'];
+        
         $handle = fopen($file, "r");
         if ($handle !== FALSE) {
-            fgetcsv($handle, 1000, ","); // Lewati baris pertama (Header Judul Kolom)
-            $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, total_donasi, frekuensi_donasi, kategori) VALUES (NOW(), ?, ?, ?, ?, ?)");
+            // Otomatis deteksi delimiter dari baris pertama (header) agar lebih efisien
+            $header_line = fgets($handle);
+            rewind($handle); // Kembalikan pointer ke awal file
+            $delimiter = (strpos($header_line, ';') !== false) ? ';' : ',';
+
+            fgetcsv($handle, 1000, $delimiter); // Lewati baris pertama (Header Judul Kolom)
+            $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $count = 0;
             
             $conn->autocommit(FALSE); // Optimasi kecepatan tinggi untuk 13.000 data
             
-            while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                $nama = $row[0] ?? 'Hamba Allah';
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
+                // Format Baru Excel: 0:No | 1:WhatsApp | 2:Nama | 3:L/P | 4:Tgl | 5:Jumlah | 6:Frekuensi | 7:Program
                 $whatsapp = $row[1] ?? '';
-                $total_donasi = isset($row[2]) ? floatval(preg_replace('/[^0-9.]/', '', $row[2])) : 0;
-                $frekuensi = isset($row[3]) ? intval($row[3]) : 1;
+                $nama = $row[2] ?? 'Hamba Allah';
+                if(empty(trim($nama))) $nama = 'Hamba Allah';
+                $gender = $row[3] ?? '-';
+                
+                $raw_waktu = $row[4] ?? '';
+                $waktu = (!empty(trim($raw_waktu)) && strtotime($raw_waktu)) ? date('Y-m-d H:i:s', strtotime($raw_waktu)) : date('Y-m-d H:i:s');
+                
+                // PERBAIKAN UTAMA: Membersihkan format mata uang (Rp, titik, koma) agar hanya angka murni yang masuk
+                $total_donasi = isset($row[5]) ? floatval(preg_replace('/[^0-9]/', '', $row[5])) : 0;
+                $frekuensi = isset($row[6]) ? intval($row[6]) : 1;
+                $program = $row[7] ?? '-';
                 
                 // AI Pelabelan RFM Otomatis
                 $kategori = "Kecil Jarang";
@@ -233,7 +248,7 @@ try {
                 else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
                 else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "Kecil Rutin"; }
                 
-                $stmt->bind_param("ssdis", $nama, $whatsapp, $total_donasi, $frekuensi, $kategori);
+                $stmt->bind_param("ssssdiss", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori);
                 $stmt->execute();
                 $count++;
             }
@@ -241,6 +256,17 @@ try {
             fclose($handle);
             $stmt->close();
             die(json_encode(["status" => "success", "message" => "Alhamdulillah! $count data donatur berhasil diimport & dikategorikan!"]));
+        }
+    }
+
+    // =======================================================
+    // 4.4b JALUR KHUSUS: KOSONGKAN DATA DONATUR (RESET)
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'clear_donatur') {
+        if ($conn->query("TRUNCATE TABLE data_donatur")) {
+            die(json_encode(["status" => "success", "message" => "Seluruh data donasi berhasil dikosongkan/di-reset!"]));
+        } else {
+            die(json_encode(["status" => "error", "message" => "Gagal mengosongkan tabel: " . $conn->error]));
         }
     }
 

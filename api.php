@@ -68,18 +68,18 @@ try {
 
         $new_name = uniqid('media_') . '.' . $file_ext;
         
-        $upload_dir = 'uploads/';
+        $upload_dir = __DIR__ . '/uploads/';
         // Gunakan file_exists seperti di kode Bos
         if (!file_exists($upload_dir)) {
             if (!mkdir($upload_dir, 0777, true)) {
-                die(json_encode(["status" => "error", "message" => "Gagal membuat folder uploads/."]));
+                die(json_encode(["status" => "error", "message" => "Gagal membuat folder: " . $upload_dir]));
             }
         }
         
         if (move_uploaded_file($file['tmp_name'], $upload_dir . $new_name)) {
             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
             $base_url = rtrim(dirname($_SERVER['PHP_SELF']), '/');
-            $file_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $base_url . "/" . $upload_dir . $new_name;
+            $file_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $base_url . "/uploads/" . $new_name;
             
             $stmt = $conn->prepare("INSERT INTO data_media (waktu, nama_file, url) VALUES (NOW(), ?, ?)");
             if (!$stmt) {

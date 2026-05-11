@@ -141,15 +141,12 @@
                 
                 <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 text-sm flex items-start">
                     <i class="fas fa-info-circle text-xl mr-3 mt-0.5"></i> 
-                    <p>Agen AI ini bertugas merumuskan <strong>Buyer Persona (Target Donatur Potensial)</strong>. Jika data statistik "Mata LDU" masih minim, AI akan otomatis melakukan riset mandiri berbekal kecerdasannya untuk jenis program yang Anda tentukan.</p>
+                    <p>Agen AI ini bertugas membaca dan menganalisa <strong>Data Pengunjung (Mata LDU)</strong> yang terekam di sistem, lalu menyajikannya menjadi ulasan performa web dan profil audiens yang mudah dipahami.</p>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Jenis Program Penggalangan Dana:</label>
-                    <input type="text" id="ai1-program-type" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 mb-4" placeholder="Contoh: Pembangunan Masjid Pelosok, Beasiswa Santri Yatim, dll">
-                    
-                    <button id="btn-ai1-analyze" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md flex items-center">
-                        <i class="fas fa-magic mr-2"></i> Riset dan Analisa Sekarang
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6 text-center">
+                    <button id="btn-ai1-analyze" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-lg transition shadow-md inline-flex items-center">
+                        <i class="fas fa-chart-line mr-2"></i> Analisa Data Pengunjung Sekarang
                     </button>
                 </div>
 
@@ -376,21 +373,15 @@
     // FUNGSI AGEN AI 1: RISET DAN ANALISA
     // ==========================================
     document.getElementById('btn-ai1-analyze').addEventListener('click', async function() {
-        const programType = document.getElementById('ai1-program-type').value.trim();
-        if (!programType) {
-            alert("Mohon isi jenis program penggalangan dana terlebih dahulu, Bos!");
-            return;
-        }
-
         const btn = this;
         const originalBtnHTML = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI Sedang Meriset...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menganalisa Data...';
         
         const resultContainer = document.getElementById('ai1-result-container');
         const resultContent = document.getElementById('ai1-result-content');
         resultContainer.classList.remove('hidden');
-        resultContent.innerHTML = '<p class="text-gray-500 italic"><i class="fas fa-cog fa-spin mr-2"></i> Menganalisa statistik web dan meriset data internet... (Proses ini bisa memakan waktu 10-30 detik)</p>';
+        resultContent.innerHTML = '<p class="text-gray-500 italic"><i class="fas fa-cog fa-spin mr-2"></i> Membaca statistik web dan memproses analisa AI... (Proses ini bisa memakan waktu 10-30 detik)</p>';
 
         try {
             // 1. Ambil data statistik saat ini dari Hostinger
@@ -403,14 +394,15 @@
                 const total = d.kunjungan.total;
                 if(total > 0) {
                     const kotaTop = d.asal_kota.length > 0 ? d.asal_kota[0].kota : '-';
-                    statText = `Total Kunjungan: ${total}. Kota terbanyak: ${kotaTop}.`;
+                    const browserTop = d.chart_browser.labels.length > 0 ? d.chart_browser.labels[0] : '-';
+                    const perangkatTop = d.chart_perangkat.labels.length > 0 ? d.chart_perangkat.labels[0] : '-';
+                    statText = `Total Kunjungan: ${total}. Kota terbanyak: ${kotaTop}. Perangkat terbanyak: ${perangkatTop}. Browser: ${browserTop}.`;
                 }
             }
 
-            // 2. KEMBALIKAN KE FORMAT PALING SEDERHANA (HANYA JUDUL PROGRAM)
-            // Pesan "Argumen tidak valid" terjadi jika Google Script menolak teks yang terlalu panjang.
-            // Kita kirim murni hanya judul programnya saja persis seperti format bawaan Google Script Bos.
-            const promptTopic = programType.trim();
+            // 2. SUSUN PROMPT ANALISA DATA PENGUNJUNG
+            const cleanStat = statText.replace(/[\r\n\t"'\\]/g, " ").trim();
+            const promptTopic = `Tolong analisa secara profesional data audiens web LDU berikut: ${cleanStat}. Berikan kesimpulan karakter audiensnya secara singkat.`;
 
             // 3. Panggil Agen AI via Google Apps Script Endpoint
             const endpoint = "https://script.google.com/macros/s/AKfycbztcWAAM2eWTSUIJ8jM2m-o72_sA8NXyG7Ck_QxYTin8sBbwf0ab6EzEMNEXe087NY/exec";

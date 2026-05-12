@@ -56,6 +56,12 @@ try {
             die(json_encode(["status" => "error", "message" => "Error upload PHP kode: " . $file_error]));
         }
 
+        // Migrasi data lama ke label tier baru agar statistik tidak nol
+        $conn->query("UPDATE data_donatur SET kategori = 'PLATINUM' WHERE kategori = 'Besar Rutin'");
+        $conn->query("UPDATE data_donatur SET kategori = 'GOLD' WHERE kategori = 'Kecil Rutin'");
+        $conn->query("UPDATE data_donatur SET kategori = 'SILVER' WHERE kategori = 'Besar Jarang'");
+        $conn->query("UPDATE data_donatur SET kategori = 'BRONZE' WHERE kategori = 'Kecil Jarang'");
+
         $original_name = $file['name'];
         // Terapkan strtolower seperti di kode Bos
         $file_ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
@@ -342,9 +348,9 @@ try {
                 if (strpos($program, '#') === 0) $program = '-';
                 
                 $kategori = "BRONZE";
-                if ($total_donasi >= 500000 && $frekuensi > 3) { $kategori = "PLATINUM"; }
-                else if ($total_donasi < 500000 && $frekuensi > 3) { $kategori = "GOLD"; }
-                else if ($total_donasi >= 500000 && $frekuensi <= 3) { $kategori = "SILVER"; }
+                if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "PLATINUM"; }
+                else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "GOLD"; }
+                else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "SILVER"; }
                 
                 $stmt->bind_param("ssssdiss", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori);
                 $stmt->execute();
@@ -418,9 +424,12 @@ try {
         $program = $data['program'] ?? '-';
         
         $kategori = "BRONZE";
-        if ($total_donasi >= 500000 && $frekuensi > 3) { $kategori = "PLATINUM"; }
-        else if ($total_donasi < 500000 && $frekuensi > 3) { $kategori = "GOLD"; }
-        else if ($total_donasi >= 500000 && $frekuensi <= 3) { $kategori = "SILVER"; }
+        if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "PLATINUM"; }
+        else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "GOLD"; }
+        else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "SILVER"; }
+        if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "PLATINUM"; }
+        else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "GOLD"; }
+        else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "SILVER"; }
         
         $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssdiss", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori);
@@ -586,9 +595,9 @@ try {
             $total_donasi = floatval($d['total_donasi']);
             $frekuensi = intval($d['frekuensi_donasi']);
             $kategori = "BRONZE";
-            if ($total_donasi >= 500000 && $frekuensi > 3) { $kategori = "PLATINUM"; }
-            else if ($total_donasi < 500000 && $frekuensi > 3) { $kategori = "GOLD"; }
-            else if ($total_donasi >= 500000 && $frekuensi <= 3) { $kategori = "SILVER"; }
+            if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "PLATINUM"; }
+            else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "GOLD"; }
+            else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "SILVER"; }
             
             $stmt->bind_param("ssssdiss", $d['waktu'], $d['nama'], $d['whatsapp'], $d['gender'], $total_donasi, $frekuensi, $d['program'], $kategori);
             $stmt->execute();

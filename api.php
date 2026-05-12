@@ -535,6 +535,68 @@ try {
         }
     }
 
+    // =======================================================
+    // 4.7 JALUR KHUSUS: TRANSAKSI DONASI PENDING (DARI FORM DEPAN)
+    // =======================================================
+    if (isset($data['action']) && in_array($data['action'], ['submit_donasi_pending', 'get_donasi_pending', 'verify_donasi_pending', 'delete_donasi_pending'])) {
+        $conn->query("CREATE TABLE IF NOT EXISTS `data_donasi_pending` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `waktu` DATETIME,
+            `panggilan` VARCHAR(50),
+            `nama` VARCHAR(150),
+            `whatsapp` VARCHAR(50),
+            `nominal` DECIMAL(15,2) DEFAULT 0,
+            `status` VARCHAR(50) DEFAULT 'Pending'
+        )");
+
+        if ($data['action'] === 'submit_donasi_pending') {
+            $panggilan = $data['panggilan'] ?? 'Bapak/Ibu';
+            $nama = $data['nama'] ?? 'Hamba Allah';
+            $whatsapp = $data['wa'] ?? '';
+            $nominal = floatval($data['nominal'] ?? 0);
+            
+            $stmt = $conn->prepare("INSERT INTO data_donasi_pending (waktu, panggilan, nama, whatsapp, nominal, status) VALUES (NOW(), ?, ?, ?, ?, 'Pending')");
+            $stmt->bind_param("sssd", $panggilan, $nama, $whatsapp, $nominal);
+            if ($stmt->execute()) { die(json_encode(["status" => "success", "message" => "Donasi pending berhasil dicatat!"])); } 
+            else { die(json_encode(["status" => "error", "message" => "Gagal mencatat donasi: " . $stmt->error])); }
+        }
+
+        if ($data['action'] === 'get_donasi_pending') {
+            $res = $conn->query("SELECT * FROM data_donasi_pending WHERE status='Pending' ORDER BY id DESC");
+            $pending = []; if ($res) { while($r = $res->fetch_assoc()) { $pending[] = $r; } }
+            die(json_encode(["status" => "success", "data" => $pending]));
+        }
+
+        if ($data['action'] === 'verify_donasi_pending') {
+            $id = $data['id'] ?? '';
+            $res = $conn->query("SELECT * FROM data_donasi_pending WHERE id='$id' AND status='Pending'");
+            if ($res && $res->num_rows > 0) {
+                $row = $res->fetch_assoc();
+                $gender = ($row['panggilan'] == 'Bapak' || $row['panggilan'] == 'Mas') ? 'L' : (($row['panggilan'] == 'Ibu' || $row['panggilan'] == 'Mbak') ? 'P' : '-');
+                $kategori = ($row['nominal'] >= 500000) ? 'Besar Jarang' : 'Kecil Jarang';
+                $waktu = date('Y-m-d H:i:s');
+
+                $conn->autocommit(FALSE);
+                try {
+                    $conn->query("UPDATE data_donasi_pending SET status='Lunas' WHERE id='$id'");
+                    $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, 1, 'Donasi Umum (Form Web)', ?)");
+                    $stmt->bind_param("ssssds", $waktu, $row['nama'], $row['whatsapp'], $gender, $row['nominal'], $kategori);
+                    $stmt->execute();
+                    $conn->commit();
+                    die(json_encode(["status" => "success", "message" => "Donasi diverifikasi & masuk ke tabel Data Donatur Lunas!"]));
+                } catch (Exception $e) { $conn->rollback(); die(json_encode(["status" => "error", "message" => "Gagal verifikasi: " . $e->getMessage()])); }
+            } else { die(json_encode(["status" => "error", "message" => "Data tidak ditemukan / sudah lunas."])); }
+        }
+
+        if ($data['action'] === 'delete_donasi_pending') {
+            $id = $data['id'] ?? '';
+            $stmt = $conn->prepare("DELETE FROM data_donasi_pending WHERE id=?");
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) { die(json_encode(["status" => "success", "message" => "Data pending berhasil dihapus!"])); } 
+            else { die(json_encode(["status" => "error", "message" => "Gagal menghapus data: " . $stmt->error])); }
+        }
+    }
+
     // 5. JALUR KHUSUS: EKSEKUSI SQL DARI GOOGLE APPS SCRIPT
     $sql = isset($data['sql_base64']) ? base64_decode($data['sql_base64']) : ($data['sql'] ?? '');
     $params = $data['params'] ?? [];

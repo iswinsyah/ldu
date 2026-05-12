@@ -301,7 +301,7 @@
 
     <!-- Script Form Donasi Frontpage -->
     <script>
-        document.getElementById('btn-proses-donasi').addEventListener('click', function() {
+        document.getElementById('btn-proses-donasi').addEventListener('click', async function() {
             const panggilan = document.getElementById('donasi-panggilan').value;
             const nama = document.getElementById('donasi-nama').value.trim();
             const wa = document.getElementById('donasi-wa').value.trim();
@@ -317,7 +317,38 @@
                 return;
             }
 
-            alert(`Terima kasih ${panggilan} ${nama}!\n\nNiat baik donasi Anda sebesar Rp ${Number(nominal).toLocaleString('id-ID')} telah kami catat.\n\n(Nantinya tombol ini bisa disambungkan langsung ke WhatsApp Konfirmasi Admin, API Hostinger, atau Payment Gateway seperti Tripay/Midtrans).`);
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sedang Memproses...';
+
+            const payload = {
+                token: 'LduBerkah999!',
+                action: 'submit_donasi_pending',
+                panggilan: panggilan,
+                nama: nama,
+                wa: wa,
+                nominal: nominal
+            };
+
+            try {
+                const response = await fetch("api.php", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    alert(`Alhamdulillah, Terima kasih ${panggilan} ${nama}!\n\nNiat baik donasi Anda telah kami catat.\nKlik OK untuk melanjutkan konfirmasi rekening ke WhatsApp Admin kami.`);
+                    
+                    // GANTI NOMOR WA ADMIN INI DENGAN NOMOR ASLI LEMBAGA BOS
+                    const waAdmin = "6281234567890"; 
+                    const waMsg = encodeURIComponent(`Assalamu'alaikum, saya ${panggilan} ${nama}.\nSaya baru saja mengisi formulir donasi di website sebesar *Rp ${Number(nominal).toLocaleString('id-ID')}*.\n\nMohon info nomor rekening tujuan transfernya 🙏`);
+                    window.open(`https://wa.me/${waAdmin}?text=${waMsg}`, '_blank');
+                    
+                    document.getElementById('form-donasi-utama').reset();
+                } else {
+                    alert("Gagal memproses donasi: " + result.message);
+                }
+            } catch(error) { alert("Error Server: " + error.message); } 
+            finally { btn.disabled = false; btn.innerHTML = originalText; }
         });
     </script>
 

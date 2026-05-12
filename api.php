@@ -56,12 +56,6 @@ try {
             die(json_encode(["status" => "error", "message" => "Error upload PHP kode: " . $file_error]));
         }
 
-        // Migrasi data lama ke label tier baru agar statistik tidak nol
-        $conn->query("UPDATE data_donatur SET kategori = 'PLATINUM' WHERE kategori = 'Besar Rutin'");
-        $conn->query("UPDATE data_donatur SET kategori = 'GOLD' WHERE kategori = 'Kecil Rutin'");
-        $conn->query("UPDATE data_donatur SET kategori = 'SILVER' WHERE kategori = 'Besar Jarang'");
-        $conn->query("UPDATE data_donatur SET kategori = 'BRONZE' WHERE kategori = 'Kecil Jarang'");
-
         $original_name = $file['name'];
         // Terapkan strtolower seperti di kode Bos
         $file_ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
@@ -190,6 +184,12 @@ try {
             `frekuensi_donasi` INT DEFAULT 1,
             `kategori` VARCHAR(50)
         )");
+
+        // Migrasi data lama ke label tier baru agar statistik tidak nol (Dipindah ke sini)
+        $conn->query("UPDATE data_donatur SET kategori = 'PLATINUM' WHERE kategori = 'Besar Rutin'");
+        $conn->query("UPDATE data_donatur SET kategori = 'GOLD' WHERE kategori = 'Kecil Rutin'");
+        $conn->query("UPDATE data_donatur SET kategori = 'SILVER' WHERE kategori = 'Besar Jarang'");
+        $conn->query("UPDATE data_donatur SET kategori = 'BRONZE' WHERE kategori = 'Kecil Jarang'");
 
         // Otomatis tambahkan kolom baru jika belum ada di database (Kompatibel untuk semua versi MySQL)
         $colCheck1 = $conn->query("SHOW COLUMNS FROM `data_donatur` LIKE 'gender'");

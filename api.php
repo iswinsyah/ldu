@@ -600,6 +600,21 @@ try {
     }
 
     // =======================================================
+    // 4.6b JALUR KHUSUS: AMBIL SAMPEL DATA PLATINUM UNTUK AI
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'get_platinum_data') {
+        // Ambil 50 data Platinum teratas sebagai sampel untuk dibaca AI
+        $res = $conn->query("SELECT nama, gender, total_donasi, frekuensi_donasi, program FROM data_donatur WHERE kategori = 'PLATINUM' ORDER BY total_donasi DESC LIMIT 50");
+        $text = "";
+        if($res) {
+            while($r = $res->fetch_assoc()) {
+                $text .= "- Nama: {$r['nama']}, Gender: {$r['gender']}, Total Donasi: Rp " . number_format($r['total_donasi'],0,',','.') . ", Frekuensi: {$r['frekuensi_donasi']}x, Minat Program: {$r['program']}\n";
+            }
+        }
+        die(json_encode(["status" => "success", "data" => $text]));
+    }
+
+    // =======================================================
     // 4.7 JALUR KHUSUS: TRANSAKSI DONASI PENDING (DARI FORM DEPAN)
     // =======================================================
     if (isset($data['action']) && in_array($data['action'], ['submit_donasi_pending', 'get_donasi_pending', 'verify_donasi_pending', 'delete_donasi_pending'])) {

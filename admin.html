@@ -169,9 +169,12 @@
                     <p>Agen AI ini bertugas membaca dan menganalisa <strong>Data Pengunjung (Mata LDU)</strong> yang terekam di sistem, lalu menyajikannya menjadi ulasan performa web dan profil audiens yang mudah dipahami.</p>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6 text-center">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 justify-center">
                     <button id="btn-ai1-analyze" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-lg transition shadow-md inline-flex items-center">
-                        <i class="fas fa-chart-line mr-2"></i> Analisa Data Pengunjung Sekarang
+                        <i class="fas fa-chart-line mr-2"></i> Analisa Kunjungan Web
+                    </button>
+                    <button id="btn-ai1-platinum" class="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-3 px-8 rounded-lg transition shadow-md inline-flex items-center">
+                        <i class="fas fa-crown mr-2"></i> Analisa Persona PLATINUM
                     </button>
                 </div>
 
@@ -291,6 +294,7 @@
                                     <th class="px-6 py-3">Tanggal</th>
                                     <th class="px-4 py-3">Hari</th>
                                     <th class="px-6 py-3">Jumlah</th>
+                                    <th class="px-4 py-3">Tier</th>
                                     <th class="px-6 py-3">Program</th>
                                     <th class="px-6 py-3 text-right">Aksi</th>
                                 </tr>
@@ -713,6 +717,45 @@
         }
     });
 
+    // ==========================================
+    // FUNGSI AGEN AI 1: ANALISA PERSONA PLATINUM
+    // ==========================================
+    document.getElementById('btn-ai1-platinum').addEventListener('click', async function() {
+        const btn = this;
+        const originalBtnHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengumpulkan Data...';
+        
+        const resultContainer = document.getElementById('ai1-result-container');
+        const resultContent = document.getElementById('ai1-result-content');
+        resultContainer.classList.remove('hidden');
+        resultContent.innerHTML = '<p class="text-gray-500 italic"><i class="fas fa-cog fa-spin mr-2"></i> Membaca database donatur VIP dan memproses analisa AI... (Memakan waktu 10-30 detik)</p>';
+
+        try {
+            // 1. Ambil data sampel Platinum dari DB
+            const platResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'get_platinum_data' }) });
+            const platResult = await platResponse.json();
+            
+            if (platResult.status === 'success' && platResult.data.trim() !== '') {
+                const promptTopic = `Berikut adalah sampel data riwayat donatur kelas PLATINUM (VIP Terbaik) dari lembaga kami:\n\n${platResult.data}\n\nTolong analisa "Buyer Persona" mereka secara mendalam layaknya marketer profesional. Siapa target audiens kami sebenarnya? Apa minat program utama mereka? Dan tolong beri 3 saran cara/gaya bahasa terbaik untuk melakukan promosi (follow-up) penggalangan dana kepada mereka melalui pesan WhatsApp.`;
+
+                btn.innerHTML = '<i class="fas fa-brain fa-spin mr-2"></i> AI Menganalisa...';
+                
+                // 2. Tembak ke AI
+                const aiResponse = await fetch(HOSTINGER_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'call_ai', prompt: promptTopic }) });
+                const aiResult = await aiResponse.json();
+                
+                if (aiResult.status === "success") {
+                    let formattedText = aiResult.data.replace(/\*\*/g, '<b>').replace(/\*/g, '•').replace(/\n/g, '<br>');
+                    resultContent.innerHTML = formattedText;
+                } else { resultContent.innerHTML = `<span class="text-red-500 font-bold">Gagal melakukan riset: ${aiResult.message}</span>`; }
+            } else {
+                resultContent.innerHTML = `<span class="text-yellow-600 font-bold">Belum ada donatur yang memenuhi kriteria PLATINUM saat ini. Silakan kumpulkan data donasi lebih banyak atau gunakan fitur 'Gabungkan by WA'.</span>`;
+            }
+        } catch (error) { resultContent.innerHTML = `<span class="text-red-500 font-bold">Terjadi kesalahan koneksi ke AI: ${error.message}</span>`; } 
+        finally { btn.disabled = false; btn.innerHTML = originalBtnHTML; }
+    });
+
     // FUNGSI TOMBOL ACCEPT AI 1
     document.getElementById('btn-ai1-accept').addEventListener('click', function() {
         alert("Alhamdulillah, Persona Donatur berhasil diterima dan disimpan!\n\nNantinya data ini akan kita oper ke 'Agen AI 2 Generator' untuk merangkai detail Program Donasi otomatis.");
@@ -816,6 +859,13 @@
                         
                         let program = d.program || '-';
                         
+                        let tierColor = 'bg-gray-100 text-gray-600';
+                        let kat = d.kategori || 'BRONZE';
+                        if(kat === 'PLATINUM') tierColor = 'bg-green-100 text-green-700 border border-green-200 shadow-sm';
+                        else if(kat === 'GOLD') tierColor = 'bg-yellow-100 text-yellow-700 border border-yellow-200 shadow-sm';
+                        else if(kat === 'SILVER') tierColor = 'bg-blue-100 text-blue-700 border border-blue-200 shadow-sm';
+                        else if(kat === 'BRONZE') tierColor = 'bg-red-50 text-red-600 border border-red-200';
+
                         tbody.innerHTML += `
                             <tr class="border-b border-gray-50 hover:bg-gray-50">
                                 <td class="px-4 py-4"><input type="checkbox" class="cb-donatur rounded border-gray-300 cursor-pointer" value="${d.id}" onchange="toggleBulkButton()"></td>
@@ -826,6 +876,7 @@
                                 <td class="px-6 py-4 text-gray-500">${tgl}</td>
                                 <td class="px-4 py-4 text-gray-500 capitalize">${hari}</td>
                                 <td class="px-6 py-4 font-bold text-green-600">Rp ${Number(d.total_donasi).toLocaleString('id-ID')}</td>
+                                <td class="px-4 py-4"><span class="px-2 py-1 rounded text-[10px] font-bold ${tierColor}">${kat}</span></td>
                                 <td class="px-6 py-4 text-gray-600 truncate max-w-xs" title="${program}">${program}</td>
                                 <td class="px-6 py-4 text-right">
                                     <button onclick="editDonatur(${d.id})" class="text-blue-500 hover:text-blue-700 mr-3" title="Edit"><i class="fas fa-edit"></i></button>

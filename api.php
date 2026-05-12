@@ -214,10 +214,10 @@ try {
         $summary['total_filtered'] = $conn->query("SELECT COUNT(*) FROM data_donatur $where")->fetch_row()[0] ?? 0;
         $summary['total_pages'] = ceil($summary['total_filtered'] / $limit);
         $summary['total'] = $conn->query("SELECT COUNT(*) FROM data_donatur")->fetch_row()[0] ?? 0;
-        $summary['kecil_jarang'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Kecil Jarang'")->fetch_row()[0] ?? 0;
-        $summary['kecil_rutin'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Kecil Rutin'")->fetch_row()[0] ?? 0;
-        $summary['besar_jarang'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Besar Jarang'")->fetch_row()[0] ?? 0;
-        $summary['besar_rutin'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'Besar Rutin'")->fetch_row()[0] ?? 0;
+        $summary['bronze'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'BRONZE'")->fetch_row()[0] ?? 0;
+        $summary['silver'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'SILVER'")->fetch_row()[0] ?? 0;
+        $summary['gold'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'GOLD'")->fetch_row()[0] ?? 0;
+        $summary['platinum'] = $conn->query("SELECT COUNT(*) FROM data_donatur WHERE kategori = 'PLATINUM'")->fetch_row()[0] ?? 0;
 
         die(json_encode(["status" => "success", "data" => $donaturs, "summary" => $summary]));
     }
@@ -341,10 +341,10 @@ try {
                 $program = ($c_prog !== -1 && isset($row[$c_prog])) ? trim($row[$c_prog]) : '-';
                 if (strpos($program, '#') === 0) $program = '-';
                 
-                $kategori = "Kecil Jarang";
-                if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "Besar Rutin"; }
-                else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
-                else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "Kecil Rutin"; }
+                $kategori = "BRONZE";
+                if ($total_donasi >= 500000 && $frekuensi > 3) { $kategori = "PLATINUM"; }
+                else if ($total_donasi < 500000 && $frekuensi > 3) { $kategori = "GOLD"; }
+                else if ($total_donasi >= 500000 && $frekuensi <= 3) { $kategori = "SILVER"; }
                 
                 $stmt->bind_param("ssssdiss", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori);
                 $stmt->execute();
@@ -417,10 +417,10 @@ try {
         $frekuensi = intval($data['frek'] ?? 1);
         $program = $data['program'] ?? '-';
         
-        $kategori = "Kecil Jarang";
-        if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "Besar Rutin"; }
-        else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
-        else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "Kecil Rutin"; }
+        $kategori = "BRONZE";
+        if ($total_donasi >= 500000 && $frekuensi > 3) { $kategori = "PLATINUM"; }
+        else if ($total_donasi < 500000 && $frekuensi > 3) { $kategori = "GOLD"; }
+        else if ($total_donasi >= 500000 && $frekuensi <= 3) { $kategori = "SILVER"; }
         
         $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssdiss", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori);
@@ -477,10 +477,10 @@ try {
         $frekuensi = intval($data['frek'] ?? 1);
         $program = $data['program'] ?? '-';
         
-        $kategori = "Kecil Jarang";
-        if ($total_donasi >= 500000 && $frekuensi >= 3) { $kategori = "Besar Rutin"; }
-        else if ($total_donasi >= 500000 && $frekuensi < 3) { $kategori = "Besar Jarang"; }
-        else if ($total_donasi < 500000 && $frekuensi >= 3) { $kategori = "Kecil Rutin"; }
+        $kategori = "BRONZE";
+        if ($total_donasi >= 500000 && $frekuensi > 3) { $kategori = "PLATINUM"; }
+        else if ($total_donasi < 500000 && $frekuensi > 3) { $kategori = "GOLD"; }
+        else if ($total_donasi >= 500000 && $frekuensi <= 3) { $kategori = "SILVER"; }
         
         $stmt = $conn->prepare("UPDATE data_donatur SET waktu=?, nama=?, whatsapp=?, gender=?, total_donasi=?, frekuensi_donasi=?, program=?, kategori=? WHERE id=?");
         $stmt->bind_param("ssssdissi", $waktu, $nama, $whatsapp, $gender, $total_donasi, $frekuensi, $program, $kategori, $id);
@@ -573,7 +573,7 @@ try {
             if ($res && $res->num_rows > 0) {
                 $row = $res->fetch_assoc();
                 $gender = ($row['panggilan'] == 'Bapak' || $row['panggilan'] == 'Mas') ? 'L' : (($row['panggilan'] == 'Ibu' || $row['panggilan'] == 'Mbak') ? 'P' : '-');
-                $kategori = ($row['nominal'] >= 500000) ? 'Besar Jarang' : 'Kecil Jarang';
+                $kategori = ($row['nominal'] >= 500000) ? 'SILVER' : 'BRONZE'; // frekuensi 1 (<=3)
                 $waktu = date('Y-m-d H:i:s');
 
                 $conn->autocommit(FALSE);

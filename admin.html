@@ -227,20 +227,20 @@
                         <h3 id="rfm-total" class="text-2xl font-bold text-gray-800">...</h3>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Kecil Jarang</p>
-                        <h3 id="rfm-kj" class="text-xl font-bold text-red-500">...</h3>
+                        <p class="text-xs text-gray-500 mb-1">Bronze</p>
+                        <h3 id="rfm-bronze" class="text-xl font-bold text-red-500">...</h3>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Kecil Rutin</p>
-                        <h3 id="rfm-kr" class="text-xl font-bold text-yellow-500">...</h3>
+                        <p class="text-xs text-gray-500 mb-1">Silver</p>
+                        <h3 id="rfm-silver" class="text-xl font-bold text-blue-500">...</h3>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Besar Jarang</p>
-                        <h3 id="rfm-bj" class="text-xl font-bold text-blue-500">...</h3>
+                        <p class="text-xs text-gray-500 mb-1">Gold</p>
+                        <h3 id="rfm-gold" class="text-xl font-bold text-yellow-500">...</h3>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center border-b-4 border-green-500">
-                        <p class="text-xs text-green-600 font-bold mb-1">Besar Rutin (VIP)</p>
-                        <h3 id="rfm-br" class="text-xl font-bold text-green-600">...</h3>
+                        <p class="text-xs text-green-600 font-bold mb-1">Platinum (VIP)</p>
+                        <h3 id="rfm-platinum" class="text-xl font-bold text-green-600">...</h3>
                     </div>
                 </div>
 
@@ -780,10 +780,10 @@
             if (result.status === 'success') {
                 currentDonaturData = result.data;
                 document.getElementById('rfm-total').innerText = result.summary.total;
-                document.getElementById('rfm-kj').innerText = result.summary.kecil_jarang;
-                document.getElementById('rfm-kr').innerText = result.summary.kecil_rutin;
-                document.getElementById('rfm-bj').innerText = result.summary.besar_jarang;
-                document.getElementById('rfm-br').innerText = result.summary.besar_rutin;
+                document.getElementById('rfm-bronze').innerText = result.summary.bronze;
+                document.getElementById('rfm-silver').innerText = result.summary.silver;
+                document.getElementById('rfm-gold').innerText = result.summary.gold;
+                document.getElementById('rfm-platinum').innerText = result.summary.platinum;
 
                 // Reset status centang masal saat data baru dimuat
                 document.getElementById('selectAllDonatur').checked = false;

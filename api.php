@@ -536,6 +536,70 @@ try {
     }
 
     // =======================================================
+    // 4.4g JALUR KHUSUS: GABUNGKAN DUPLIKAT BERDASARKAN WA
+    // =======================================================
+    if (isset($data['action']) && $data['action'] === 'aggregate_donatur') {
+        $res = $conn->query("SELECT * FROM data_donatur ORDER BY id ASC");
+        $map = [];
+        $no_wa_list = [];
+        
+        if ($res) {
+            while ($r = $res->fetch_assoc()) {
+                $wa = trim($r['whatsapp']);
+                // Bersihkan WA: Hapus spasi/tanda hubung, lalu ubah awalan 62 jadi 0 agar seragam
+                $wa_clean = preg_replace('/[^0-9]/', '', $wa);
+                if (substr($wa_clean, 0, 2) === '62') { $wa_clean = '0' . substr($wa_clean, 2); }
+                
+                if (empty($wa_clean) || strlen($wa_clean) < 8) {
+                    $no_wa_list[] = $r; 
+                } else {
+                    if (!isset($map[$wa_clean])) {
+                        $r['whatsapp'] = $wa_clean; // Simpan WA yang sudah rapi
+                        $map[$wa_clean] = $r;
+                    } else {
+                        $map[$wa_clean]['total_donasi'] += floatval($r['total_donasi']);
+                        $map[$wa_clean]['frekuensi_donasi'] += intval($r['frekuensi_donasi']);
+                        
+                        if (strtotime($r['waktu']) >= strtotime($map[$wa_clean]['waktu'])) {
+                            $map[$wa_clean]['waktu'] = $r['waktu'];
+                            $map[$wa_clean]['nama'] = $r['nama']; 
+                        }
+                        
+                        $prog1 = $map[$wa_clean]['program']; $prog2 = $r['program'];
+                        if ($prog2 !== '-' && !empty(trim($prog2)) && strpos($prog1, $prog2) === false) {
+                            $map[$wa_clean]['program'] = ($prog1 === '-' || empty(trim($prog1))) ? $prog2 : $prog1 . ', ' . $prog2;
+                        }
+                        if (strlen($map[$wa_clean]['program']) > 200) { $map[$wa_clean]['program'] = substr($map[$wa_clean]['program'], 0, 197) . '...'; }
+                    }
+                }
+            }
+        }
+        
+        $final_data = array_merge(array_values($map), $no_wa_list);
+        
+        $conn->autocommit(FALSE);
+        $conn->query("TRUNCATE TABLE data_donatur");
+        $stmt = $conn->prepare("INSERT INTO data_donatur (waktu, nama, whatsapp, gender, total_donasi, frekuensi_donasi, program, kategori) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        
+        $count = 0;
+        foreach ($final_data as $d) {
+            $total_donasi = floatval($d['total_donasi']);
+            $frekuensi = intval($d['frekuensi_donasi']);
+            $kategori = "BRONZE";
+            if ($total_donasi >= 500000 && $frekuensi > 3) { $kategori = "PLATINUM"; }
+            else if ($total_donasi < 500000 && $frekuensi > 3) { $kategori = "GOLD"; }
+            else if ($total_donasi >= 500000 && $frekuensi <= 3) { $kategori = "SILVER"; }
+            
+            $stmt->bind_param("ssssdiss", $d['waktu'], $d['nama'], $d['whatsapp'], $d['gender'], $total_donasi, $frekuensi, $d['program'], $kategori);
+            $stmt->execute();
+            $count++;
+        }
+        $conn->commit();
+        
+        die(json_encode(["status" => "success", "message" => "Alhamdulillah! Data transaksi berhasil digabungkan. Total donatur unik saat ini: " . $count]));
+    }
+
+    // =======================================================
     // 4.7 JALUR KHUSUS: TRANSAKSI DONASI PENDING (DARI FORM DEPAN)
     // =======================================================
     if (isset($data['action']) && in_array($data['action'], ['submit_donasi_pending', 'get_donasi_pending', 'verify_donasi_pending', 'delete_donasi_pending'])) {

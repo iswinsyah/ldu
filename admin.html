@@ -258,6 +258,9 @@
                             <button id="btn-import-csv" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition shadow whitespace-nowrap text-sm">
                                 <i class="fas fa-upload mr-2"></i> Import Data
                             </button>
+                            <button id="btn-aggregate-donatur" class="bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold py-2 px-4 rounded-md transition shadow-sm border border-purple-200 whitespace-nowrap text-sm">
+                                <i class="fas fa-object-group mr-2"></i> Gabungkan by WA
+                            </button>
                             <button id="btn-kosongkan-donatur" class="bg-red-50 text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-md transition shadow-sm whitespace-nowrap border border-red-200 text-sm" title="Reset/Hapus Semua Data">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
@@ -949,6 +952,24 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    });
+
+    // ==========================================
+    // FUNGSI GABUNGKAN DUPLIKAT (AGREGASI BY WA)
+    // ==========================================
+    document.getElementById('btn-aggregate-donatur').addEventListener('click', async function() {
+        if(confirm("Fitur ini akan menyatukan baris data donasi yang memiliki Nomor WhatsApp yang sama.\n\nNominal donasinya akan dijumlahkan dan Frekuensi akan dihitung otomatis. Lanjutkan?")) {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menggabungkan...';
+            try {
+                const response = await fetch(HOSTINGER_API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: HOSTINGER_TOKEN, action: 'aggregate_donatur' }) });
+                const result = await response.json();
+                if (result.status === 'success') { alert(result.message); loadDonatur(1); }
+                else { alert("Gagal: " + result.message); }
+            } catch (error) { alert("Error: " + error.message); }
+            finally { btn.disabled = false; btn.innerHTML = originalText; }
+        }
     });
 
     document.getElementById('btn-kosongkan-donatur').addEventListener('click', async function() {

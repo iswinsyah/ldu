@@ -8,6 +8,22 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Tambahkan library pembuat Grafik -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Gaya untuk fitur Resize Kolom Tabel (Drag & Drop) */
+        .resizer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            cursor: col-resize;
+            user-select: none;
+            height: 100%;
+            z-index: 10;
+        }
+        .resizer:hover, .resizing {
+            border-right: 2px solid #10b981; /* Warna hijau Tailwind */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
 
@@ -258,7 +274,7 @@
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
+                        <table id="tabel-donatur" class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-gray-50 text-gray-500 uppercase text-xs">
                                     <th class="px-4 py-3"><input type="checkbox" id="selectAllDonatur" class="rounded border-gray-300 cursor-pointer"></th>
@@ -1041,8 +1057,52 @@
         }
     }
 
+    // ==========================================
+    // FUNGSI RESIZE KOLOM TABEL (DRAG & DROP)
+    // ==========================================
+    function initResizableColumns() {
+        const table = document.getElementById('tabel-donatur');
+        if (!table) return;
+        const cols = table.querySelectorAll('thead th');
+        
+        cols.forEach(col => {
+            // Jangan tambahkan resizer di kolom terakhir (Aksi)
+            if (col === cols[cols.length - 1]) return;
+            
+            col.style.position = 'relative';
+            const resizer = document.createElement('div');
+            resizer.classList.add('resizer');
+            col.appendChild(resizer);
+            
+            let startX, startWidth;
+            
+            resizer.addEventListener('mousedown', function(e) {
+                startX = e.clientX;
+                startWidth = col.offsetWidth;
+                resizer.classList.add('resizing');
+                
+                function doDrag(e) {
+                    const newWidth = startWidth + (e.clientX - startX);
+                    col.style.width = newWidth + 'px';
+                    col.style.minWidth = newWidth + 'px';
+                    col.style.maxWidth = newWidth + 'px';
+                }
+                
+                function stopDrag() {
+                    resizer.classList.remove('resizing');
+                    document.documentElement.removeEventListener('mousemove', doDrag);
+                    document.documentElement.removeEventListener('mouseup', stopDrag);
+                }
+                
+                document.documentElement.addEventListener('mousemove', doDrag);
+                document.documentElement.addEventListener('mouseup', stopDrag);
+            });
+        });
+    }
+
     // Panggil dashboard saat halaman pertama kali dibuka
     switchTab('dashboard');
+    initResizableColumns();
     </script>
 </body>
 </html>

@@ -1,0 +1,8 @@
+Halo AI, mari kita lanjutkan proyek sistem Lumbung Dana Umat (LDU) Kota Batu. 
+
+Konteks Proyek:
+1. Tech Stack: Frontend menggunakan Vanilla HTML + Tailwind CSS. Backend menggunakan PHP murni (api.php) dan MySQL di Hostinger.
+2. Struktur: Ada halaman depan (index.html), dan halaman Admin (admin.html) berbentuk Single Page Application dengan tab navigasi.
+3. Fitur Terakhir: Kita sudah menyelesaikan Dashboard Statistik (Chart.js), Manajemen Data Donatur (Import CSV, Gabungkan by WA, Bulk Delete), Sistem RFM Tiering (Platinum, Gold, Silver, Bronze), Formulir Donasi Pending yang terhubung ke WA, dan Integrasi Agen AI Gemini untuk Riset Persona & Generator Program.
+
+Tolong persiapkan ingatanmu tentang arsitektur ini. Apa yang bisa kita bantu kerjakan sekarang?
